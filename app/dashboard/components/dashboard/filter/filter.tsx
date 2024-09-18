@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar, faFilter } from "@fortawesome/free-solid-svg-icons";
 
-const TimeRangeFilter = () => {
+const filter = () => {
   const [selected, setSelected] = useState("30 days");
 
   const timeRanges = ["12 months", "30 days", "7 days", "24 hours"];
@@ -40,4 +40,4 @@ const TimeRangeFilter = () => {
   );
 };
 
-export default TimeRangeFilter;
+export default filter;
