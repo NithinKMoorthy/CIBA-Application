@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import UsedSpace from "@/app/dashboard/components/nav/UsedSpace";
+import UsedSpace from "./UsedSpace";
 import { Protest_Guerrilla } from '@next/font/google';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faCreditCard,faFileInvoice,faChartLine, faUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'; // Party icon
