@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import SearchBar from '@/app/dashboard/components/dashboard/header/searchbar'
-const header = () => {
+const Header = () => {
   return (
     <div className="flex justify-between p-4 w-full  ">
       {/* Left Side: Title and Subtitle */}
@@ -17,4 +17,4 @@ const header = () => {
   );
 };
 
-export default header;
+export default Header;

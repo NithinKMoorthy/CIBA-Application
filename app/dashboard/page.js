@@ -1,10 +1,10 @@
 import React from 'react';
 import {getSession} from '@auth0/nextjs-auth0';
 import {redirect} from 'next/navigation';
-import Header from '@/app/dashboard/components/dashboard/header/header';
+import Header from '@/app/dashboard/components/dashboard/header/Header';
 import Filter from '@/app/dashboard/components/dashboard/filter/Filter';
-import HighLevelAccountInfo from '@/app/dashboard/components/dashboard/high-level-account-info/high-level-account-info';
-import DeeperAccount from '@/app/dashboard/components/dashboard/graphs/DeeperAccount/deeperaccount';
+import HighLevelAccountInfo from '@/app/dashboard/components/dashboard/high-level-account-info/HighLevelAccountInfo';
+import DeeperAccount from '@/app/dashboard/components/dashboard/graphs/DeeperAccount/DeeperAccount';
 const Profile = async () => {
     const session = await getSession();
     const user = session?.user;
