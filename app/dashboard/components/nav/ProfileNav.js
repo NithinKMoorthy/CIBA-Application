@@ -2,17 +2,16 @@
 
 import React from "react";
 import UsedSpace from "./UsedSpace";
-import { Protest_Guerrilla } from 'next/font/google';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faCreditCard,faFileInvoice,faChartLine, faUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'; // Party icon
 import { usePathname } from "next/navigation"; // Correct hook for app directory routing
 import Link from "next/link";
 // Initialize the Protest Guerrilla font
-const protestGuerrilla = Protest_Guerrilla({
-  subsets: ['latin'],
-  weight: ['400'], // You can add more weights if needed
-  display: 'swap',  // Ensures better performance
-});
+// const protestGuerrilla = Protest_Guerrilla({
+//   subsets: ['latin'],
+//   weight: ['400'], // You can add more weights if needed
+//   display: 'swap',  // Ensures better performance
+// });
 
 const ProfileNav = () => {
   const pathname = usePathname(); 
@@ -21,8 +20,8 @@ const ProfileNav = () => {
     <div className="flex flex-col flex-grow h-full w-full ">
       {/* Logo Section */}
       {/* Brand Section with Protest Guerrilla Font */}
-      <div className={`flex p-5 items-center pl-2 text-3xl ${protestGuerrilla.className}  justify-start ml-2`}>
-       <Link href='/'> Konko Bank </Link>
+      <div className={`flex p-5 items-center pl-2 text-3xl  justify-start ml-2`}>
+       <Link href='/'> <img src="./logo.png" /> </Link>
       </div> 
       {/* Navigation Links */}
       <div className="flex flex-grow-[3] flex-col items-start justify-start rounded flex-grow  space-y-2 p-2 font-serif ">

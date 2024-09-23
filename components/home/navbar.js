@@ -9,13 +9,13 @@ import React from "react";
 import Link from 'next/link';
 
 
-const NavBar = ({protest}) => {
+const NavBar = () => {
   const { user, error, isLoading } = useUser();
   return (
     <div className= 'flex-col '> 
       <div className='flex p-4 bg-white'> 
-        <div className={`flex flex-grow-[1] items-center pl-12 text-4xl ${protest.className}`}>         
-          Konko Bank 
+        <div className={`flex flex-grow-[1] items-center pl-12 text-4xl `}>         
+          <img src='./logo.png'/>
         </div> 
         <div className='flex flex-grow-[8] justify-start font-serif items-center text-thin font-thin text-gray-600'> 
           <div className='flex justify-between flex-grow'> 
