@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Modal from '../modal/modal';
 
-const BalanceComponent =  () => {
+const Header =  () => {
     const [currency, setCurrency] = useState("USD");  
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [message, setMessage] = useState(''); 
@@ -83,4 +83,4 @@ const BalanceComponent =  () => {
   );
 };
 
-export default BalanceComponent;
+export default Header;
