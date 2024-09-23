@@ -1,6 +1,6 @@
 // app/admin/layout.tsx
 import React from 'react';
-import ProfileNav from '../../components/nav/ProfileNav';
+import ProfileNav from '@/components/nav/ProfileNav';
 
 export default function ProfileLayout({
   children,
