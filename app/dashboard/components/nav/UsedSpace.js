@@ -3,7 +3,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear, faMessage } from '@fortawesome/free-solid-svg-icons'; // Party icon
 
-const SpaceNotification = () => {
+const UsedSpace = () => {
   return (
     <div className="flex flex-col"> 
         <div className='space-y-2 p-2'> 
@@ -45,4 +45,4 @@ const SpaceNotification = () => {
   );
 };
 
-export default SpaceNotification;
+export default UsedSpace;
