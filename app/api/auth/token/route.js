@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getAccessToken, getSession } from '@auth0/nextjs-auth0';
 import jwksClient from 'jwks-rsa';
+import jwt from 'jsonwebtoken';
+
+export const dynamic = 'force-dynamic'; // Ensure dynamic route
+
 const client = jwksClient({
   jwksUri: `https://dev-ow0gmshf.us.auth0.com/.well-known/jwks.json`,
 });
@@ -37,16 +41,21 @@ const handleTokenVerification = (idToken) => {
     });
   });
 };
+
 // Create an API route using App Router's new structure
-export async function GET(request: Request) {
+export async function GET(request) {
   try {
     // Retrieve access token from session
-    const accessToken = await getAccessToken();
-    const session = await getSession();
+    const { accessToken } = await getAccessToken(); // Destructure accessToken
+    const session = await getSession(request); // Pass request object if necessary
     const idToken = session?.idToken;
-    // Respond with the access token
-    return NextResponse.json({ accessToken, idToken });
-  } catch (error: any) {
+
+    // Perform token verification if needed
+    const isMfaVerified = await handleTokenVerification(idToken);
+
+    // Respond with the access token and verification status
+    return NextResponse.json({ accessToken, idToken, isMfaVerified });
+  } catch (error) {
     console.error('Error retrieving access token:', error);
     return NextResponse.json({ error: error.message }, { status: error.status || 500 });
   }

@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import jwksClient from 'jwks-rsa';
 
+export const dynamic = 'force-dynamic'; // Ensure this route is dynamic
+
 // Correct JWKS URI with full Auth0 domain
 const client = jwksClient({
   jwksUri: `https://dev-ow0gmshf.us.auth0.com/.well-known/jwks.json`,
@@ -42,10 +44,10 @@ const handleTokenVerification = (idToken) => {
 };
 
 // API route to verify MFA
-export async function GET() {
+export async function GET(request) { // Add 'request' parameter here
   try {
     // Retrieve the session to get the ID token
-    const session = await getSession();
+    const session = await getSession(request); // Pass 'request' to getSession
     const idToken = session?.idToken;
 
     if (!idToken) {
