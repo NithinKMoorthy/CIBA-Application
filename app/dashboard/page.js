@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import {getSession} from '@auth0/nextjs-auth0';
 import {redirect} from 'next/navigation';
 import Header from '../../components/dashboard/header/Header';
@@ -11,6 +12,7 @@ const Profile = async () => {
     if(!user) {
         redirect('/');
     }
+  
     return (
         <div className="flex flex-col flex-grow  p-4 h-full"> 
             <Header /> 

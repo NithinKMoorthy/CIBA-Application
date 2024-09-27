@@ -1,4 +1,5 @@
 "use client"
+import axios from 'axios';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
@@ -11,8 +12,9 @@ const Header =  () => {
     const [message, setMessage] = useState(''); 
     const [title, setTitle] = useState(''); 
     const { user } = useUser();
+    const [userId, setUserId] =  useState(''); 
+    const [token,setToken] = useState(''); 
     const openModal = (title, msg) => {
-        console.log("HERE IN OPEN MODAL");
         setMessage(msg);
         setTitle(title);
         setIsModalVisible(true);
@@ -23,6 +25,7 @@ const Header =  () => {
       };
     const handleSendMoney = async () => {
         console.log("Check", user);
+        setUserId(user.sub)
         if(user) {
             try {
                 const response = await fetch('/api/auth/verify-mfa', {
@@ -42,6 +45,17 @@ const Header =  () => {
             }
         }
     }
+    const fetchToken = async () => {
+      const response = await axios.get('/api/m2m', {headers: {'Content-Type': 'application/json'}});
+      setToken(response.data.token); 
+      manageMFA(token);
+    }
+    const manageMFA = async(token) => {
+      console.log("Token", token); 
+      const response = await axios.get(`https://dev-ow0gmshf.us.auth0.com/api/v2/users/${userId}/authenticators`, {headers: {'Authorization': `Bearer ${token}`}})
+      console.log("Response: ", response.data);
+    }
+    console.log("Token: ", token);
   return (
     <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md w-full h-[10%]">
         <Modal isVisible={isModalVisible} onClose={closeModal} title={title}>
@@ -70,7 +84,7 @@ const Header =  () => {
 
       {/* Right Side: Add Funds and Send Money Buttons */}
       <div className="flex items-center space-x-3">
-        <button className="flex items-center bg-white text-gray-700 px-4 py-2 rounded border border-gray-300">
+        <button onClick={fetchToken} className="flex items-center bg-white text-gray-700 px-4 py-2 rounded border border-gray-300">
           Add Funds{" "}
           <FontAwesomeIcon icon={faDollarSign} className="ml-2 text-blue-500" />
         </button>
