@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { UserProvider } from '@auth0/nextjs-auth0/client';
+import NavBar from '@/components/home/navbar';
 
 import Banner from '@/components/home/banner';
 import './global.css';
@@ -20,8 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex flex-col h-screen">
+        
         <UserProvider>
-          
             <main className="flex flex-grow justify-center h-screen">{children}</main>
         </UserProvider>
       </body>

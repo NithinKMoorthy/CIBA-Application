@@ -7,7 +7,8 @@ export default async function HomePage() {
   const user = session?.user;
   console.log(user);
   return (
-    <div className="flex flex-grow" >
+    <div className="flex flex-grow flex-col" >
+      <NavBar /> 
       <Home /> 
    </div>
   );

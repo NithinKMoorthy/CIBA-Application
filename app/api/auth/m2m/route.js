@@ -4,7 +4,7 @@ import axios from 'axios';
 export async function GET() {
   const clientId = 'yrWxK1NYTvtsSA20UswtvqVUojjBwEMX';
   const clientSecret = '-en0wiP4J6Ir_NsfcuZ6JDxUrxNQTvQ6q-aUuRUt2MpBIzywauU12L0E6qXy6haT';
-  const domain = 'https://m2m-api';
+  const domain = 'https://dev-ow0gmshf.us.auth0.com/api/v2/';
 
   const options = {
     method: 'POST',
@@ -13,7 +13,7 @@ export async function GET() {
     data: {
       client_id: clientId,
       client_secret: clientSecret,
-      audience: 'https://m2m-api',
+      audience: 'https://dev-ow0gmshf.us.auth0.com/api/v2/',
       grant_type: 'client_credentials',
     },
   };
@@ -22,7 +22,7 @@ export async function GET() {
     const response = await axios(options);
     const accessToken = response.data.access_token;
 
-    return NextResponse.json({ token: accessToken });
+    return NextResponse.json({ accessToken });
   } catch (error) {
     console.error('Error fetching MFA token:', error.response?.data || error.message);
     return NextResponse.json(

@@ -14,7 +14,7 @@ const Profile = async () => {
     }
   
     return (
-        <div className="flex flex-col flex-grow  p-4 h-full"> 
+        <div className="flex flex-col flex-grow p-4 h-full"> 
             <Header /> 
             <Filter /> 
             <HighLevelAccountInfo /> 
