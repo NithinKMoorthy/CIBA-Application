@@ -31,7 +31,7 @@ export default function EnrollSMS() {
     let token = await getM2MToken(); 
     try {
       const response = await axios.post('/api/auth/generateCustomEnrollmentTicket', {
-        userId: user.sub,
+        userId: user?.sub,
         phoneNumber,
         m2mToken: token
       });
