@@ -15,6 +15,7 @@ const config: Config = {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+          'custom-gradient': 'linear-gradient(135deg, #4F9DFF 0%, #6CC76A 50%, #FFD66B 100%)',
       },
       fontFamily: {
         roboto: ['Roboto', 'sans-serif'],

@@ -11,6 +11,7 @@ export default function Component() {
   const [isLoading, setIsLoading] = useState(false);
   const [associate, setAssociate] = useState(false);
   const [otp, setOtp] = useState('');
+  const [oobCode, setOobCode] = useState('');
 
   
   const handleLogin = async () => {
@@ -36,6 +37,7 @@ export default function Component() {
       let error = err.response.data;
       if (error.error === 'mfa_required') {
         console.log("HERE");
+        console.log("Error.mfa_token:" , error.mfa_token);
         setMfaToken(error.mfa_token);
         promptMFA(error.mfa_token); // Access the nested structure
       } else {
@@ -53,25 +55,27 @@ export default function Component() {
     handleLogin()
   }
   const promptMFA= async (accessToken) => {
-    console.log("PROMPT MFA");
-    const authenticators = await axios.get('https://dev-ow0gmshf.us.auth0.com/mfa/authenticators', {
+    console.log("PROMPT MFA", accessToken);
+    const authenticatorsResponse = await axios.get('https://dev-ow0gmshf.us.auth0.com/mfa/authenticators', {
       headers: {
         'Authorization': `Bearer ${accessToken}`, 
         'Content-Type': 'application/json'
       }
     });
-
-    console.log("RESPONSE from Authenticators", authenticators.data[4]);
+    let authenticators = authenticatorsResponse.data; 
+    console.log("RESPONSE from Authenticators", authenticators);
     console.log('mfa TOKEN: ', mfaToken);
     let challengeResponse = await axios.post(
       '/api/auth/challenge', {
-        mfa_token: mfaToken,
-        authenticators: authenticators.data[4].id
+        mfa_token: accessToken,
+        authenticators: authenticators[0].id
       }
     )
-    console.log("challengeResponse: ", challengeResponse);
+    console.log("challengeResponse: ", challengeResponse.data);
+    let oobCode = challengeResponse.data.oob_code;
+    setOobCode(oobCode); 
 
-
+    
      
     // let associate_response = await axios.post(
     //   'https://dev-ow0gmshf.us.auth0.com/mfa/associate',
@@ -88,14 +92,16 @@ export default function Component() {
     //   }
     // );
     // console.log("Associate_RESPONSE: ", associate_response);
-    // setAssociate(true);
+    setAssociate(true);
   }
   const handleOtpSubmit = async () => {
-    // alert(`Submitted ${otp}`);
-    const response = await axios.post('/api/verify-otp', {
+    alert(`Submitted ${otp}`);
+    const response = await axios.post('/api/auth/verify-otp', {
       mfa_token: mfaToken,
       otp,
+      oobCode
     });
+    alert(response.data);
    console.log("RESPONSE.DATA: ", response.data);
   }
   return (
@@ -167,7 +173,7 @@ export default function Component() {
                 <p className="text-red-600 text-center text-sm">{error}</p>
               )}
               <button
-                type="submit"
+                onClick={handleOtpSubmit}
                 disabled={isLoading || otp.length < 6}
                 className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200"
               >

@@ -4,7 +4,6 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { SignupButton } from "@/components/auth-components/signup-button";
 import { LoginButton } from "@/components/auth-components/login-button";
 import { LoginWithROPG } from "@/components/auth-components/login-with-ropg-button";
-
 import { LogoutButton } from "@/components/auth-components/logout-button";
 import React from "react";
 import Link from "next/link";
@@ -21,7 +20,7 @@ const NavBar = () => {
     if (pathname === "/ropgLogin") {
       return <LoginWithROPG />;
     }
-    if (pathname === "/" || pathname === '/universal') {
+    if (pathname === "/" || pathname === "/universal") {
       return <LoginButton />;
     }
     return null;
@@ -32,60 +31,59 @@ const NavBar = () => {
   };
 
   return (
-    <div className="flex-col bg-white">
-      <div className="flex p-4">
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between p-6">
         {/* Logo */}
-        <div className="flex flex-grow-[1] items-center max-w-[15%] p-2 px-10">
-          <img src="./logo.png" alt="Logo" />
+        <div className="flex items-center max-w-[15%]">
+          <img src="./logo.png" alt="Logo" className="w-auto h-12" />
         </div>
 
         {/* Navigation Links */}
-        <div className="flex flex-grow-[8] justify-start font-serif items-center text-thin font-thin text-gray-600 p-2">
-          <div className="flex justify-between flex-grow">
+        <div className="flex-grow">
+          <nav className="flex justify-around text-small gap-8 font-medium px-10 text-gray-600">
             {!user && !isLoading ? (
-              <div>
-                <a className={`${
-                  isActiveRoute("/universal") || isActiveRoute('/')? "text-lg font-bold" : ""
-                }`}><Link href='/universal'> Universal </Link></a>
-              </div>
-            ) : (
-              <div>
-                <Link href="/dashboard">Dashboard</Link>
-              </div>
-            )}
-            <div>
               <Link
-                href="/ropgLogin"
+                href="/universal"
                 className={`${
-                  isActiveRoute("/ropgLogin") ? "text-lg  font-bold" : ""
+                  isActiveRoute("/universal") || isActiveRoute("/")
+                    ? "text-black font-semibold"
+                    : "hover:text-black"
                 }`}
               >
-                ROPG
+                Universal
               </Link>
-            </div>
-            <div>
-              <a>LockJS</a>
-            </div>
-            <div>
-              <a>QNA</a>
-            </div>
-          </div>
+            ) : (
+              <Link
+                href="/dashboard"
+                className="hover:text-black font-medium text-gray-600"
+              >
+                Dashboard
+              </Link>
+            )}
+            <Link
+              href="/ropgLogin"
+              className={`${
+                isActiveRoute("/ropgLogin")
+                  ? "text-black font-semibold"
+                  : "hover:text-black"
+              }`}
+            >
+              ROPG
+            </Link>
+            <a className="hover:text-black cursor-pointer">LockJS</a>
+            <a className="hover:text-black cursor-pointer">QNA</a>
+          </nav>
         </div>
 
         {/* Authentication Buttons */}
-        <div className="flex gap-4 flex-grow-[2] items-center justify-end pr-8">
+        <div className="flex items-center gap-4">
           {!user && !isLoading && (
             <>
               <SignupButton />
               {renderAuthButton()}
-
             </>
           )}
-          {user && !isLoading && (
-            <>
-              <LogoutButton />
-            </>
-          )}
+          {user && !isLoading && <LogoutButton />}
         </div>
       </div>
     </div>
