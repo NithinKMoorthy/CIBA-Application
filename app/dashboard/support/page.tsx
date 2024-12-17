@@ -6,7 +6,7 @@ import { useUser  } from "@auth0/nextjs-auth0/client";
 export default function EnrollSMS() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
-  const { user, getAccessTokenSilently  } = useUser();
+  const { user  } = useUser();
 
   const [message, setMessage] = useState('');
   const [enrollmentTicket, setCustomEnrollmentTicket] = useState(''); 
