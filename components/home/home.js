@@ -1,7 +1,7 @@
 "use client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGift } from "@fortawesome/free-solid-svg-icons"; // Party icon
-import Login from "@/components/home/login";
+import Login from "@/components/home/Login";
 import React, { useState, useEffect } from "react";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { usePathname, useRouter } from "next/navigation";
