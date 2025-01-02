@@ -31,62 +31,77 @@ const NavBar = () => {
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center justify-between p-6">
+    <>
+      {/* MOBILE NAV: Only logo + login button */}
+      <div className="md:hidden w-full flex items-center justify-between p-4">
         {/* Logo */}
-        <div className="flex items-center max-w-[15%]">
-          <img src="./logo.png" alt="Logo" className="w-auto h-12" />
-        </div>
+        <img src="./logo.png" alt="Logo" className="h-10 w-auto" />
 
-        {/* Navigation Links */}
-        <div className="flex-grow">
-          <nav className="flex justify-around text-small gap-8 font-medium px-10 text-gray-600">
-            {!user && !isLoading ? (
+        {/* One of the login options */}
+        <div className="flex items-center gap-2">
+          {!user && !isLoading && <LoginButton />}
+          {user && !isLoading && <LogoutButton />}
+        </div>
+      </div>
+
+      {/* DESKTOP NAV: Full navbar */}
+      <div className="hidden md:flex flex-col w-full">
+        <div className="flex items-center justify-between p-6">
+          {/* Logo */}
+          <div className="flex items-center max-w-[15%]">
+            <img src="./logo.png" alt="Logo" className="w-auto h-12" />
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex-grow">
+            <nav className="flex justify-around text-small gap-8 font-medium px-10 text-gray-600">
+              {!user && !isLoading ? (
+                <Link
+                  href="/universal"
+                  className={`${
+                    isActiveRoute("/universal") || isActiveRoute("/")
+                      ? "text-black font-semibold"
+                      : "hover:text-black"
+                  }`}
+                >
+                  Universal
+                </Link>
+              ) : (
+                <Link
+                  href="/dashboard"
+                  className="hover:text-black font-medium text-gray-600"
+                >
+                  Dashboard
+                </Link>
+              )}
               <Link
-                href="/universal"
+                href="/ropgLogin"
                 className={`${
-                  isActiveRoute("/universal") || isActiveRoute("/")
+                  isActiveRoute("/ropgLogin")
                     ? "text-black font-semibold"
                     : "hover:text-black"
                 }`}
               >
-                Universal
+                ROPG
               </Link>
-            ) : (
-              <Link
-                href="/dashboard"
-                className="hover:text-black font-medium text-gray-600"
-              >
-                Dashboard
-              </Link>
-            )}
-            <Link
-              href="/ropgLogin"
-              className={`${
-                isActiveRoute("/ropgLogin")
-                  ? "text-black font-semibold"
-                  : "hover:text-black"
-              }`}
-            >
-              ROPG
-            </Link>
-            <a className="hover:text-black cursor-pointer">LockJS</a>
-            <a className="hover:text-black cursor-pointer">QNA</a>
-          </nav>
-        </div>
+              <a className="hover:text-black cursor-pointer">LockJS</a>
+              <a className="hover:text-black cursor-pointer">QNA</a>
+            </nav>
+          </div>
 
-        {/* Authentication Buttons */}
-        <div className="flex items-center gap-4">
-          {!user && !isLoading && (
-            <>
-              <SignupButton />
-              {renderAuthButton()}
-            </>
-          )}
-          {user && !isLoading && <LogoutButton />}
+          {/* Authentication Buttons */}
+          <div className="flex items-center gap-4">
+            {!user && !isLoading && (
+              <>
+                <SignupButton />
+                {renderAuthButton()}
+              </>
+            )}
+            {user && !isLoading && <LogoutButton />}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
