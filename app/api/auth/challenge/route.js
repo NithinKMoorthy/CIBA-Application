@@ -10,17 +10,18 @@ export async function POST(req) {
 
     const clientId = 'yrWxK1NYTvtsSA20UswtvqVUojjBwEMX';
     const clientSecret = '-en0wiP4J6Ir_NsfcuZ6JDxUrxNQTvQ6q-aUuRUt2MpBIzywauU12L0E6qXy6haT';
-
+    const body =  {
+      client_id: clientId,
+      client_secret: clientSecret,
+      mfa_token: mfa_token,
+      challenge_type: 'oob',
+      authenticator_id: authenticators
+    };
+    const url = 'https://dev-ow0gmshf.us.auth0.com/mfa/challenge';
     // Make a request to Auth0 to verify the OTP
     const response = await axios.post(
-      'https://dev-ow0gmshf.us.auth0.com/mfa/challenge',
-      {
-        client_id: clientId,
-        client_secret: clientSecret,
-        mfa_token: mfa_token,
-        challenge_type: 'oob',
-        authenticator_id: authenticators
-      },
+      url, 
+      body, 
       {
         headers: {
           'Content-Type': 'application/json',

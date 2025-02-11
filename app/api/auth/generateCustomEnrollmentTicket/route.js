@@ -14,7 +14,8 @@ export async function POST(req) {
       {
         user_id: userId,  // Auth0 user ID
         send_mail: false, // Optionally send an email with enrollment instructions
-        factor: 'push-notification'
+        allow_multiple_enrollments: true, 
+        // factor: 'otp'
       },
       {
         headers: {
@@ -23,6 +24,8 @@ export async function POST(req) {
         },
       }
     );
+
+  
 
     console.log("Enrollment Ticket Response: ", enrollmentTicketResponse.data);
 
