@@ -4,6 +4,7 @@ export const GET = handleAuth({
   login: handleLogin({
     authorizationParams: {
       scope: 'openid profile email mfa',
+      audience: 'https://ropg-api'
     },
     returnTo: '/dashboard', 
   }),
