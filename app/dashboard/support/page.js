@@ -1,83 +1,128 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import axios from 'axios';
-type Authenticator = {
-  id: string;
-  name: string;
-  type: string;
-  description: string;
-  status: "Enabled" | "Disabled" | "Configured";
-  lastUpdated: string;
-  details: Record<string, any>;
-};
+import { useUser } from '@auth0/nextjs-auth0/client';
 
-const sampleAuthenticators: Authenticator[] = [
-  {
-    id: "1",
-    name: "Password Authenticator",
-    type: "Core Credential",
-    description: "Standard password-based authentication.",
-    status: "Enabled",
-    lastUpdated: "Feb 8, 2025",
-    details: {},
-  },
-  {
-    id: "2",
-    name: "SMS OTP",
-    type: "Two-Factor",
-    description: "Sends a one-time code via SMS to registered mobile numbers.",
-    status: "Enabled",
-    lastUpdated: "Feb 5, 2025",
-    details: {
-      provider: "Nexmo",
-      codeLength: 6,
-    },
-  },
-  {
-    id: "3",
-    name: "TOTP Authenticator",
-    type: "Two-Factor",
-    description:
-      "Uses a time-based algorithm. Users scan a QR code with an authenticator app like Google Authenticator.",
-    status: "Configured",
-    lastUpdated: "Feb 1, 2025",
-    details: {
-      note: "QR Code available for reconfiguration",
-    },
-  },
-  {
-    id: "4",
-    name: "Push Notification Authenticator",
-    type: "Adaptive/Push",
-    description:
-      "Sends a push notification to a linked mobile app for approval.",
-    status: "Enabled",
-    lastUpdated: "Jan 29, 2025",
-    details: {
-      device: "iPhone 14 Pro",
-    },
-  },
-  {
-    id: "5",
-    name: "Biometric Authenticator",
-    type: "Advanced/Local Device",
-    description:
-      "Uses fingerprint or face recognition on supported devices for quick login.",
-    status: "Enabled",
-    lastUpdated: "Feb 10, 2025",
-    details: {
-      lastSynced: "Feb 9, 2025",
-    },
-  },
-];
+
+import axios from 'axios';
+// type Authenticator = {
+//   id: string;
+//   name: string;
+//   type: string;
+//   description: string;
+//   status: "Enabled" | "Disabled" | "Configured";
+//   lastUpdated: string;
+//   details: Record<string, any>;
+// };
+
+
 
 const AuthenticatorDashboard = () => {
-  const [authenticators, setAuthenticators] = useState<Authenticator[]>([]);
+  const sampleAuthenticators = [
+    {
+      id: "1",
+      name: "Password Authenticator",
+      type: "Core Credential",
+      description: "Standard password-based authentication.",
+      status: "Enabled",
+      lastUpdated: "Feb 8, 2025",
+      details: {},
+    },
+    {
+      id: "2",
+      name: "SMS OTP",
+      type: "Two-Factor",
+      description: "Sends a one-time code via SMS to registered mobile numbers.",
+      status: "Enabled",
+      lastUpdated: "Feb 5, 2025",
+      details: {
+        provider: "Nexmo",
+        codeLength: 6,
+      },
+    },
+    {
+      id: "3",
+      name: "TOTP Authenticator",
+      type: "Two-Factor",
+      description:
+        "Uses a time-based algorithm. Users scan a QR code with an authenticator app like Google Authenticator.",
+      status: "Configured",
+      lastUpdated: "Feb 1, 2025",
+      details: {
+        note: "QR Code available for reconfiguration",
+      },
+    },
+    {
+      id: "4",
+      name: "Push Notification Authenticator",
+      type: "Adaptive/Push",
+      description:
+        "Sends a push notification to a linked mobile app for approval.",
+      status: "Enabled",
+      lastUpdated: "Jan 29, 2025",
+      details: {
+        device: "iPhone 14 Pro",
+      },
+    },
+    {
+      id: "5",
+      name: "Biometric Authenticator",
+      type: "Advanced/Local Device",
+      description:
+        "Uses fingerprint or face recognition on supported devices for quick login.",
+      status: "Enabled",
+      lastUpdated: "Feb 10, 2025",
+      details: {
+        lastSynced: "Feb 9, 2025",
+      },
+    },
+  ];
+  const [enrollmentTicket, setCustomEnrollmentTicket] = useState(''); 
+    const [message, setMessage] = useState('');
 
+  const getM2MToken = async () => {
+            const response = await axios.get('/api/auth/m2m');
+            return response.data.accessToken;
+    }
+  const generateTicket = async () => {
+        console.log("Enrollment Ticket: ");
+        let token = await getM2MToken(); 
+        try {
+          const response = await axios.post('/api/auth/generateCustomEnrollmentTicket', {
+            userId: user?.sub,
+            m2mToken: token
+          });
+          console.log("Enrollment Response ", response.data);
+          
+          setCustomEnrollmentTicket(response.data.ticket_url);
+        } catch (error) {
+          console.error("Error enrolling SMS MFA:", error);
+          setMessage("Failed to enroll SMS MFA");
+        }
+      };
+    
+  
+  const [authenticators, setAuthenticators] = useState(sampleAuthenticators);
+  const { user, error, isLoading } = useUser();
+  console.log("USER : ", user);
    const getToken = async () => {
     let response= await axios.get('/api/auth/getAccessTokenForUser');
     console.log("RESPONSE.data: ", response.data);
    }
+   const getAuthenticators = async () => {
+    let userId= user?.sub;
+    try {
+      const response = await axios.post('/api/auth/getAuthenticators', {
+        userId: userId?.trim(),
+      });
+  
+      console.log('Authenticators', response.data);
+
+    } catch (err) {
+      console.error('Error:', err.response?.data || err.message);
+      setError(err.response?.data?.error || 'Failed to fetch authenticators');
+    }
+  };
+  
   useEffect(() => {
     // Simulate fetching data
     setTimeout(() => {
@@ -85,14 +130,14 @@ const AuthenticatorDashboard = () => {
     }, 500);
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = () => {
     if (confirm("Are you sure you want to delete this authenticator?")) {
       setAuthenticators((prev) => prev.filter((auth) => auth.id !== id));
       console.log("Deleted authenticator with id:", id);
     }
   };
 
-  const handleEdit = (id: string) => {
+  const handleEdit = () => {
     // Open an edit modal or redirect to edit page
     console.log("Editing authenticator with id:", id);
   };
@@ -117,7 +162,13 @@ const AuthenticatorDashboard = () => {
       <button onClick={getToken} className="bg-blue-600 px-5" > 
         Get Token
       </button>
-
+      <button onClick={generateTicket}> 
+        Create Custom Enrollment Ticket   
+      </button>
+      <button onClick={getAuthenticators} className="bg-blue-600 px-5" > 
+        GET AUTHENTICATORS 
+      </button>
+      <h1> {enrollmentTicket} </h1> 
       {/* Vertical Cards List */}
       <div className="flex flex-col space-y-6">
         {authenticators.length > 0 ? (

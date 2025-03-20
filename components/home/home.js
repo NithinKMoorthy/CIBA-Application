@@ -1,85 +1,53 @@
-"use client";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGift } from "@fortawesome/free-solid-svg-icons"; // Party icon
-import Login from "@/components/home/Login";
-import React, { useState, useEffect } from "react";
+'use client';
+import React from "react";
+import NavBar from "./navbar";
+import { FaMobileAlt, FaShieldAlt, FaMoneyCheckAlt } from "react-icons/fa";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const Home = () => {
-  const { user, isAuthenticated, isLoading } = useUser();
-  const [ropg, setROPG] = useState(false);
-  const router = useRouter();
+  const { user, isLoading } = useUser();
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (pathname === "/ropgLogin") {
-      setROPG(true);
-    } else {
-      setROPG(false);
-    }
-  }, [pathname]);
-
   return (
-    <div className="flex flex-col sm:flex-row flex-grow bg-cover bg-no-repeat min-h-screen">
-      <div className="flex flex-col sm:flex-row flex-grow justify-start items-start sm:mr-4">
-        {/* Left Side */}
-        <div className="sm:w-1/2 h-full flex justify-center p-8 rounded-lg">
-          <div className="flex flex-col w-full justify-center items-start">
-            {/* Headings */}
-            <div className="w-full p-4 md:-mt-40">
-              <div className="p-2">
-                <h1
-                  className="text-transparent bg-clip-text font-bold 
-                             text-4xl sm:text-6xl md:text-7xl"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom,#2E1A68, #9B0860, #AB0363, #DDDCE7)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  Bank Smarter,
-                </h1>
-              </div>
-              <div className="p-2">
-                <h1
-                  className="text-transparent bg-clip-text font-bold
-                             text-3xl sm:text-5xl md:text-6xl"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom,#2E1A68, #9B0860, #AB0363, #DDDCE7)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  Live Better
-                </h1>
-              </div>
-            </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50 text-gray-900">
+      <NavBar />
+      
+      <main className="flex flex-col items-center text-center justify-center flex-grow px-6 mt-32">
+        <h2 className="text-5xl font-extrabold text-gray-900 mb-4">The Future of Banking, Today</h2>
+        <p className="text-lg max-w-2xl text-gray-600">
+          Experience secure, fast, and reliable banking with Konko Heights. Open an account in minutes and manage your finances with ease.
+        </p>
+        <div className="mt-6">
+          <button className="px-8 py-3 text-lg bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-all">
+            Get Started
+          </button>
+        </div>
+      </main>
 
-            {/* Paragraph */}
-            <div className="text-black px-6 p-1 font-sans 
-                            text-sm sm:text-base md:text-lg 
-                            font-light leading-loose text-gray-600"
-            >
-              Experience banking reimagined for today’s world. With cutting-edge
-              security, intuitive tools, and a personalized approach, we empower
-              you to take control of your finances—anytime, anywhere.
-            </div>
-
-            {/* Button */}
-            <div className="px-6 p-4 mt-4">
-              <button className="border border-black w-full bg-black text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl hover:opacity-90 transition-all duration-300">
-                Get Started Today
-              </button>
-            </div>
-          </div>
+      <section className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
+        <div className="p-6 text-center shadow-md bg-white rounded-lg transform hover:scale-105 transition">
+          <FaMobileAlt className="text-blue-500 text-5xl mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Mobile Banking</h3>
+          <p className="text-gray-700">Manage your finances anywhere, anytime with our secure mobile app.</p>
         </div>
 
-        {/* Conditional Rendering */}
-        {ropg && <Login />}
-      </div>
+        <div className="p-6 text-center shadow-md bg-white rounded-lg transform hover:scale-105 transition">
+          <FaShieldAlt className="text-purple-500 text-5xl mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Top-notch Security</h3>
+          <p className="text-gray-700">Your funds and data are protected with industry-leading security measures.</p>
+        </div>
+
+        <div className="p-6 text-center shadow-md bg-white rounded-lg transform hover:scale-105 transition">
+          <FaMoneyCheckAlt className="text-green-500 text-5xl mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Easy Transactions</h3>
+          <p className="text-gray-700">Send, receive, and manage money effortlessly with our seamless transaction system.</p>
+        </div>
+      </section>
+
+      <footer className="mt-16 text-center text-gray-600 py-6">
+        <p>&copy; 2025 Konko Heights. All Rights Reserved.</p>
+      </footer>
     </div>
   );
 };

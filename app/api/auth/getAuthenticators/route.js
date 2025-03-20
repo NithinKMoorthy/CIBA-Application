@@ -21,8 +21,10 @@ export async function POST(req) {
     const accessToken = tokenResponse.data.access_token;
     console.log("ACCESS TOKEN: ", accessToken);
     // Fetch authenticators
+     
+
     const response = await axios.get(
-      `https://${domain}/api/v2/users/${userId}/authenticators`,
+      `https://${domain}/api/v2/users/${userId}/authentication-methods`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

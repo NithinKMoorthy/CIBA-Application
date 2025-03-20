@@ -6,7 +6,7 @@ export default async function ROPGLogin() {
 //   console.log(user);
   return (
     <div className="flex flex-grow flex-col bg-[url('/banking-test.webp')] bg-cover ml-['40px']" >
-      <NavBar /> 
+      {/* <NavBar />  */}
       <Home /> 
       
    </div>
