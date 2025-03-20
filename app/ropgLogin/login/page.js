@@ -112,6 +112,7 @@ export default function Component() {
               <h2 className="text-2xl font-bold text-center">Login</h2>
               <p className="text-center text-gray-500">Enter your credentials to access your account</p>
             </div>
+            
             <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
               <div className="space-y-2">
                 <label htmlFor="username" className="block font-medium text-gray-700">Username</label>
@@ -149,6 +150,13 @@ export default function Component() {
                 >
                   {isLoading ? 'Signing in...' : 'Sign in'}
                 </button>
+                {/* <button
+                  onClick={handleSignUp}
+                  className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Signing in...' : 'Sign Up'}
+                </button> */}
               </div>
             </form>
         </div>

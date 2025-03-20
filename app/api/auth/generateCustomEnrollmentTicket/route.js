@@ -15,7 +15,7 @@ export async function POST(req) {
         user_id: userId,  // Auth0 user ID
         send_mail: false, // Optionally send an email with enrollment instructions
         allow_multiple_enrollments: true, 
-        // factor: 'otp'
+
       },
       {
         headers: {

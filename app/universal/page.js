@@ -8,7 +8,7 @@ export default async function HomePage() {
   console.log(user);
   return (
     <div className="flex flex-grow flex-col  bg-[url('/banking-test.webp')] bg-cover" >
-      <NavBar /> 
+      {/* <NavBar />  */}
       <Home /> 
    </div>
   );
