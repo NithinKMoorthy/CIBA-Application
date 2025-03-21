@@ -1,14 +1,16 @@
+import { NextResponse } from 'next/server';
 import { getAccessToken, withApiAuthRequired } from '@auth0/nextjs-auth0';
-// import { access } from 'fs';
 
-export default withApiAuthRequired(async function products(req, res) {
+export const GET = withApiAuthRequired(async function handler(req) {
   try {
+    const res = new Response(); // Create a response object for Auth0 functions
     const { accessToken } = await getAccessToken(req, res);
-    // const client = new BillingApiClient(accessToken);
-    console.log("ACCESS TOKEN: ", accessToken);
-    // return client.getBillingInfo();
+
+    console.log("ACCESS TOKEN:", accessToken);
+
+    return NextResponse.json({ accessToken });
   } catch(error) {
-    console.error(error)
-    res.status(error.status || 500).end(error.message)
+    console.error(error);
+    return NextResponse.json({ error: error.message }, { status: error.status || 500 });
   }
 });
