@@ -15,7 +15,7 @@ export async function POST(req) {
       client_secret: clientSecret,
       mfa_token: mfa_token,
       challenge_type: 'oob',
-      authenticator_id: authenticators
+      authenticator_id: authenticators[0].id
     };
     const url = 'https://dev-ow0gmshf.us.auth0.com/mfa/challenge';
     // Make a request to Auth0 to verify the OTP

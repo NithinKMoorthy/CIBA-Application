@@ -18,10 +18,15 @@ const NavBar = () => {
 
   const renderAuthButton = () => {
     if (pathname === "/ropgLogin") {
-      return <LoginWithROPG />;
+      return <></>;
     }
     if (pathname === "/" || pathname === "/universal") {
-      return <LoginButton />;
+      return  (
+          <>  
+            <SignupButton /> 
+            <LoginButton />
+          </>
+      );
     }
     return null;
   };
@@ -93,7 +98,6 @@ const NavBar = () => {
           <div className="flex items-center gap-4">
             {!user && !isLoading && (
               <>
-                <SignupButton />
                 {renderAuthButton()}
               </>
             )}

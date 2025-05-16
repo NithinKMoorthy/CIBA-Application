@@ -14,6 +14,11 @@ export default function Component() {
   const [oobCode, setOobCode] = useState('');
 
   
+  useEffect(() => {
+    console.log("MFA TOKEN CHANGED:", mfaToken);
+    promptMFA(); 
+  },[mfaToken])
+
   const handleLogin = async () => {
     console.log("HELLO");
     setIsLoading(true)
@@ -55,43 +60,44 @@ export default function Component() {
     handleLogin()
   }
   const promptMFA= async (accessToken) => {
-    console.log("PROMPT MFA", accessToken);
-    const authenticatorsResponse = await axios.get('https://dev-ow0gmshf.us.auth0.com/mfa/authenticators', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`, 
-        'Content-Type': 'application/json'
-      }
-    });
-    let authenticators = authenticatorsResponse.data; 
-    console.log("RESPONSE from Authenticators", authenticators);
-    console.log('mfa TOKEN: ', mfaToken);
-    let challengeResponse = await axios.post(
-      '/api/auth/challenge', {
-        mfa_token: accessToken,
-        authenticators: authenticators[0].id
-      }
-    )
-    console.log("challengeResponse: ", challengeResponse.data);
-    let oobCode = challengeResponse.data.oob_code;
-    setOobCode(oobCode); 
+    // console.log("PROMPT MFA", accessToken);
+    // const authenticatorsResponse = await axios.get('https://dev-ow0gmshf.us.auth0.com/mfa/authenticators', {
+    //   headers: {
+    //     'Authorization': `Bearer ${accessToken}`, 
+    //     'Content-Type': 'application/json'
+    //   }
+    // });
+    // let authenticators = authenticatorsResponse.data; 
+    // console.log("RESPONSE from Authenticators", authenticators);
+    // console.log('mfa TOKEN: ', mfaToken);
+    // let challengeResponse = await axios.post(
+    //   '/api/auth/challenge', {
+    //     mfa_token: accessToken,
+    //     authenticators: authenticators[0].id
+    //   }
+    // )
+    // console.log("challengeResponse: ", challengeResponse.data);
+    // let oobCode = challengeResponse.data.oob_code;
+    // setOobCode(oobCode); 
 
     
-     
-    // let associate_response = await axios.post(
-    //   'https://dev-ow0gmshf.us.auth0.com/mfa/associate',
-    //   {
-    //     authenticator_types: ["oob"],
-    //     oob_channels: ["sms"],
-    //     phone_number: '+14254355486'
-    //   },
-    //   {
-    //     headers: {
-    //       'Authorization': `Bearer ${accessToken}`,
-    //       'Content-Type': 'application/json'
-    //     }
-    //   }
-    // );
-    // console.log("Associate_RESPONSE: ", associate_response);
+    console.log("MFA TOKEN BEFORE CALL: ", mfaToken); 
+    let associate_response = await axios.post(
+      'https://dev-ow0gmshf.us.auth0.com/mfa/associate',
+      {
+        authenticator_types: ["oob"],
+        oob_channels: ["sms"],
+        phone_number: "+19725108935"
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${mfaToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    console.log("Associate_RESPONSE: ", associate_response);
     setAssociate(true);
   }
   const handleOtpSubmit = async () => {
