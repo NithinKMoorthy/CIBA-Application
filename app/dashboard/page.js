@@ -13,7 +13,7 @@ import Expenses from '@/components/dashboard/graphs/total-expense';
 import Income from '@/components/dashboard/graphs/total-income';
 import MoneyFlowChart from '@/components/dashboard/graphs/DeeperAccount/money-chart';
 import TransactionComponent from '@/components/dashboard/graphs/DeeperAccount/transactions';
-import SearchBar from '@/components/dashboard/header/SearchBar';
+// import SearchBar from '@/components/dashboard/header/SearchBar';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar, faFilter } from "@fortawesome/free-solid-svg-icons";
 
@@ -47,7 +47,7 @@ const Header = () => {
       </div>
 
       {/* Right Side: Search Placeholder */}
-      <div className="text-gray-600"><SearchBar /> </div>
+      {/* <div className="text-gray-600"><SearchBar /> </div> */}
 
     </div>
   );
