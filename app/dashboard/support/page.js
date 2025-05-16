@@ -99,7 +99,25 @@ const AuthenticatorDashboard = () => {
           setMessage("Failed to enroll SMS MFA");
         }
       };
+  
+  const uploadEmail = async () => {
+    let token = await getM2MToken(); 
     
+    console.log("EMAIL: ", token); 
+    try {
+      const response = await axios.post('/api/auth/addEmail', {
+        userId: user?.sub,
+        m2mToken: token
+      });
+      console.log("Email Response ", response.data);
+      
+      setCustomEnrollmentTicket(response.data.ticket_url);
+    } catch (error) {
+      console.error("Error enrolling SMS MFA:", error);
+      setMessage("Failed to enroll SMS MFA");
+    }
+  };
+  
   
   const [authenticators, setAuthenticators] = useState(sampleAuthenticators);
   const { user, error, isLoading } = useUser();
@@ -122,7 +140,15 @@ const AuthenticatorDashboard = () => {
       setError(err.response?.data?.error || 'Failed to fetch authenticators');
     }
   };
-  
+  const updateEmail = async() => {
+    const token = await getM2MToken();
+    const response = await axios.post('/api/auth/enableEmailFactor', {
+      m2mToken: token
+    });
+    console.log("RESPONSE: ", response.data);
+    
+
+  }
   useEffect(() => {
     // Simulate fetching data
     setTimeout(() => {
@@ -168,6 +194,12 @@ const AuthenticatorDashboard = () => {
       <button onClick={getAuthenticators} className="bg-blue-600 px-5" > 
         GET AUTHENTICATORS 
       </button>
+      <button onClick={uploadEmail} className='bg-blue-600 px-5'>
+        Email Upload 
+      </button>
+      <button onClick={() => updateEmail() }>
+                  Enable Email
+              </button>
       <h1> {enrollmentTicket} </h1> 
       {/* Vertical Cards List */}
       <div className="flex flex-col space-y-6">
@@ -221,6 +253,8 @@ const AuthenticatorDashboard = () => {
                 >
                   Delete
                 </button>
+           
+
               </div>
             </div>
           ))

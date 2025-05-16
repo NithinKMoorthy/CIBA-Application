@@ -31,6 +31,7 @@ export async function POST(req) {
         },
       }
     );
+    console.log("GET Authenicators: ", response.data);
     return NextResponse.json(response.data);
   } catch (error) {
     console.error('Error fetching authenticators:', error.response?.data || error.message);
@@ -40,3 +41,6 @@ export async function POST(req) {
     );
   }
 }
+
+
+
