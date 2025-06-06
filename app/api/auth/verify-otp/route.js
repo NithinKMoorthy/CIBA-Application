@@ -4,8 +4,8 @@ import axios from 'axios';
 export async function POST(req) {
   try {
     // Parse the request body
-    const { mfa_token, otp, oobCode } = await req.json();
-    console.log("MFA TOKEN: ", mfa_token);
+    const { mfaToken, otp, oobCode } = await req.json();
+    console.log("MFA TOKEN: ", mfaToken);
     console.log("OTP: ", otp);
     console.log("OOB CODE: ", oobCode);
 
@@ -20,7 +20,7 @@ export async function POST(req) {
         grant_type: 'http://auth0.com/oauth/grant-type/mfa-oob',
         client_id,
         client_secret,
-        mfa_token,
+        mfa_token: mfaToken,
         oob_code: oobCode,
         binding_code: otp,
       }).toString(),
@@ -34,7 +34,7 @@ export async function POST(req) {
     // Return successful response
     return NextResponse.json(response.data);
   } catch (error) {
-    console.error("Error making Auth0 request:", error);
+    // console.error("Error making Auth0 request:", error);
 
     // Check if the error has a response (from Auth0)
     if (error.response) {

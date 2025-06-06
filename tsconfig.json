@@ -32,6 +32,6 @@
     "components/**/*.js",
     "components/**/*.ts",
     "components/**/*.tsx"
-  ],
+, ".next/types/app/config/actions/page.js"  ],
   "exclude": ["node_modules"]
 }

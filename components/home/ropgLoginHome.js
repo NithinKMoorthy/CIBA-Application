@@ -4,6 +4,7 @@ import NavBar from "./navbar";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import axios from 'axios';
 import { Shield, Smartphone, TrendingUp, ChevronRight, Lock, AlertCircle } from "lucide-react";
+import { jwtDecode } from 'jwt-decode';
 
 const Home = () => {
   const { user, isLoading: isUserLoading } = useUser();
@@ -37,72 +38,67 @@ const Home = () => {
     setIsLoading(false);
   };
 
-  const promptMFA = async (mfa_token) => {
-    let enrolledAuthenticators = await getAuthenticators(mfa_token);
+  const promptMFA = async (token) => {
+    const enrolledAuthenticators = await getAuthenticators(token);
     console.log("Enrolled Authenticators: ", enrolledAuthenticators);
-    let challengeAuthenticators = await challengeSecondaryFactor(mfa_token, enrolledAuthenticators); 
-    // const res = await axios.post(
-    //   'https://dev-ow0gmshf.us.auth0.com/mfa/associate',
-    //   {
-    //     authenticator_types: ["oob"],
-    //     oob_channels: ["sms"],
-    //     phone_number: "+14254355486"
-    //   },
-    //   {
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`,
-    //       'Content-Type': 'application/json'
-    //     }
-    //   }
-    // );
-    // setAssociate(true);
-    // console.log("MFA Association Response: ", res.data);
+  
+    await challengeSecondaryFactor(token, enrolledAuthenticators);
   };
 
-  const getAuthenticators = async (mfa_token) => {
-    let enrolledAuthenticators = await axios.get('https://dev-ow0gmshf.us.auth0.com/mfa/authenticators', {
-      headers: {
-        'Authorization': `Bearer ${mfa_token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(response => {
-      console.log(response.data);
+  const getAuthenticators = async (token) => {
+    try {
+      const response = await axios.get('https://dev-ow0gmshf.us.auth0.com/mfa/authenticators', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       return response.data;
-    })
-    .catch(error => {
-      console.error('Error fetching authenticators:', error.response ? error.response.data : error.message);
-    });
-    return enrolledAuthenticators; 
-  }
+    } catch (error) {
+      console.error('Error fetching authenticators:', error.response?.data || error.message);
+    }
+  };
 
-  const challengeSecondaryFactor = async (mfa_token, authenticators) => {
-    const payload = {
-      authenticators,
-      mfa_token
-    };
-    setAssociate(true);
-    let response = await axios.post('api/auth/challenge', payload)
-              .then(res => {
-                console.log("Res.Data: ", res.data);
-                console.log("Oob Code: ", res.data.oob_code);
-                setOobCode(res.data.oob_code);
-                return res.data;
-              });
-  }
-  const handleOtpSubmit = async (mfa_token, mfaResponse) => {
-    console.log("In Handle OTP Submit");
-    console.log("OTP:", otp );
-    console.log("OOBCODE: ", oobCode);
-    console.log("MFA RESPONSE: ", mfaResponse);
-    // let oobCode = mfaResponse.oobCode;
-    const res = await axios.post('/api/auth/verify-otp', {
-      mfa_token,
+  const challengeSecondaryFactor = async (token, authenticators) => {
+    console.log("TOKEN: ", token);
+    try {
+      const payload = {
+        authenticators,
+        mfa_token: token
+      };
+      setAssociate(true);
+      const response = await axios.post('api/auth/challenge', payload);
+      console.log("Challenge response: ", response.data);
+      setOobCode(response.data.oob_code);
+    } catch (err) {
+      console.error("Error during challenge: ", err.response?.data || err.message);
+    }
+  };
+
+  const handleOtpSubmit = async () => {
+    // alert(`Submitted ${otp}`);
+    console.log("MFA_TOKEN: ", mfaToken);
+    const response = await axios.post('/api/auth/verify-otp', {
+      mfaToken,
       otp,
       oobCode
+    }).then(res => {
+      console.log("Res.data: ", res.data);
+      createSession(res.data);
+    })
+    .catch(err => console.log('Error: ', error)); 
+  }
+
+  const createSession = async (session) => {
+    console.log("Creating Session");
+    const decodedUser = jwtDecode(session.id_token); // Decode user info
+    await axios.post('/api/auth/createSession', {
+      accessToken: session.access_token,
+      idToken: session.id_token,
+      user: decodedUser, // You'll need to decode the ID token or fetch user info manually
     });
-    console.log("Verified OTP: ", res.data);
-  };
+    window.location.href = '/dashboard';
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100 text-slate-800">

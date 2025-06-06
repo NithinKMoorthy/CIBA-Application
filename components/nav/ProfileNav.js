@@ -6,6 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faCreditCard,faFileInvoice,faChartLine, faUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'; // Party icon
 import { usePathname } from "next/navigation"; // Correct hook for app directory routing
 import Link from "next/link";
+import Image from 'next/image';
+
+
+
 // Initialize the Protest Guerrilla font
 // const protestGuerrilla = Protest_Guerrilla({
 //   subsets: ['latin'],
@@ -21,7 +25,7 @@ const ProfileNav = () => {
       {/* Logo Section */}
       {/* Brand Section with Protest Guerrilla Font */}
       <div className={`flex p-5 items-center pl-2 text-3xl  justify-start ml-2`}>
-       <Link href='/'> <img src="./logo.png" /> </Link>
+       <Link href='/'> <Image src="/logo.png" alt="Logo" width={220} height={40} /></Link>
       </div> 
       {/* Navigation Links */}
       <div className="flex flex-grow-[3] flex-col items-start justify-start rounded flex-grow  space-y-2 p-2 font-serif ">

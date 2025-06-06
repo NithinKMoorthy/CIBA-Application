@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import SearchBar from '@/components/dashboard/header/searchbar'
+import SearchBar from '@/components/dashboard/header/SearchBar'
 const Header = () => {
   return (
     <div className="flex justify-between p-4 w-full  ">
