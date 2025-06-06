@@ -10,7 +10,7 @@ const Home = () => {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-blue-50 text-gray-900">
+    <div className="min-h-screen min-w-screen flex flex-col bg-gradient-to-b from-white to-blue-50 text-gray-900">
       <NavBar />
       
       <main className="flex flex-col items-center text-center justify-center flex-grow px-6 mt-32">

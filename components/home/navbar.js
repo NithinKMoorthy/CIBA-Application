@@ -89,7 +89,16 @@ const NavBar = () => {
               >
                 ROPG
               </Link>
-              <a className="hover:text-black cursor-pointer">LockJS</a>
+              <Link
+                href="/config"
+                className={`${
+                  isActiveRoute("/config")
+                    ? "text-black font-semibold"
+                    : "hover:text-black"
+                }`}
+              >
+                About
+              </Link>
               <a className="hover:text-black cursor-pointer">QNA</a>
             </nav>
           </div>

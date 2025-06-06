@@ -1,0 +1,392 @@
+{
+    "version": "3.0.0",
+    "form": {
+      "name": "MFA Management",
+      "description": null,
+      "messages": {
+        "custom": {},
+        "errors": {}
+      },
+      "languages": {
+        "default": null,
+        "primary": "en"
+      },
+      "translations": {},
+      "start": {
+        "nextNode": "flow_YQx5",
+        "coordinates": {
+          "x": -100,
+          "y": 84
+        },
+        "hiddenFields": []
+      },
+      "nodes": [
+        {
+          "id": "step_taB9",
+          "type": "STEP",
+          "alias": null,
+          "config": {
+            "nextNode": "router_ocYh",
+            "components": [
+              {
+                "id": "list_factors",
+                "hint": null,
+                "type": "CUSTOM",
+                "label": null,
+                "config": {
+                  "css": null,
+                  "code": "function ListFactors(context) {\n  let component_state = {\n    action: 'return_to_website',\n    selected_factor: null,\n    enrollment_id: null,\n  }\n\n  const factorsMeta = {\n    sms: {\n      title: \"Phone Message\",\n      description:\n        \"Users will receive a phone message with a verification code\",\n    },\n    \"push-notification\": {\n      title: \"Push Notification using Auth0 Guardian\",\n      description: \"Provide a push notification using Auth0 Guardian.\",\n    },\n    otp: {\n      title: \"One-time Password\",\n      description:\n        \"Provide a one-time password using Google Authenticator or similar.\",\n    },\n    email: {\n      title: \"Email\",\n      description:\n        \"Users will receive an email message containing a verification code.\",\n    },\n    duo: {\n      title: \"Duo Security\",\n      description: \"Use your DUO account for Multi-factor Authentication.\",\n    },\n    \"webauthn-roaming\": {\n      title: \"WebAuthn with FIDO Security Keys\",\n      description:\n        \"Depending on your browser, you can use WebAuthn-compliant security keys (like FIDO2) as a second factor of authentication.\",\n    },\n    \"webauthn-platform\": {\n      title: \"WebAuthn with FIDO Device Biometrics\",\n      description:\n        \"Depending on your browser, you can use WebAuthn-compliant device biometrics as a second factor of authentication\",\n    },\n    \"recovery-code\": {\n      title: \"Recovery Code\",\n      description:\n        \"Provide a unique code that allows users to regain access to their account.\",\n    },\n  };\n\n  function filterFactors(availableFactors, enrolledFactors, allowedFactors) {\n    return availableFactors\n      .filter(\n        (factor) => factor.enabled && allowedFactors.includes(factor.name)\n      )\n      .map((factor) => {\n        const enrollmentInfo = enrolledFactors.find((enrollment) => {\n          let factorName = factor.name;\n\n          if (factor.name === \"sms\" || factor.name === \"voice\") {\n            factorName = \"phone\";\n          }\n\n          return enrollment.type.includes(factorName);\n        });\n\n        return {\n          ...factor,\n          enrollment_id: enrollmentInfo?.id,\n        };\n      });\n  }\n\n  function handleEnroll(factor) {\n    component_state.action = 'enroll_factor';\n    component_state.selected_factor = factor.name;\n    context.form.goForward();\n  }\n\n  function handleRemove(factor) {\n    component_state.action = 'remove_factor';\n    component_state.selected_factor = factor.name;\n    component_state.enrollment_id = factor.enrollment_id;\n    context.form.goForward();\n  }\n\n  function buildFactorOption(factor) {\n    const factorContainer = document.createElement('div');\n    factorContainer.classList.add('factor-container');\n\n    const factorInfo = document.createElement('div');\n    factorInfo.classList.add('factor-info-container');\n\n    const factorTitleContainer = document.createElement('div');\n    factorTitleContainer.classList.add('factor-title-container');\n\n    const factorTitle = document.createElement('span');\n    factorTitle.classList.add('factor-title');\n    factorTitle.innerText = factorsMeta[factor.name].title;\n\n    factorTitleContainer.appendChild(factorTitle);\n\n    if (factor.enrollment_id) {\n      const factorTitleTag = document.createElement('span');\n      factorTitleTag.classList.add('factor-tag');\n      factorTitleTag.innerText = 'Enrolled';\n\n      factorTitleContainer.appendChild(factorTitleTag);\n    }\n\n    const factorDescription = document.createElement('div');\n    factorDescription.classList.add('factor-description');\n    factorDescription.innerText = factorsMeta[factor.name].description;\n\n    factorInfo.appendChild(factorTitleContainer);\n    factorInfo.appendChild(factorDescription);\n\n    factorContainer.appendChild(factorInfo);\n\n    const factorAction = document.createElement('div');\n    factorAction.classList.add('factor-action');\n\n    const factorButton = document.createElement('button');\n    factorButton.type = 'button';\n    factorAction.appendChild(factorButton);\n    \n    if (factor.enrollment_id) {\n      factorButton.classList.add('factor-remove');\n      factorButton.innerText = 'Remove';\n      factorButton.onclick = () => handleRemove(factor);\n    } else {\n      factorButton.classList.add('factor-enroll');\n      factorButton.innerText = 'Enroll';\n      factorButton.onclick = () => handleEnroll(factor);\n    }\n\n    factorContainer.appendChild(factorAction);\n\n    return factorContainer;\n  }\n\n  function mountComponent() {\n    const config = context.custom.getParams();\n    const { available_factors, enrolled_factors, allowed_factors } = config;\n\n    const filteredFactors = filterFactors(available_factors, enrolled_factors, allowed_factors);\n\n    const factorsContainer = document.createElement('div');\n    factorsContainer.classList.add('factors-container');\n\n    filteredFactors.forEach((factor) => {\n      const factorOption = buildFactorOption(factor);\n      factorsContainer.appendChild(factorOption);\n    });\n\n    return factorsContainer;\n  }\n\n  return {\n    init() {\n      return mountComponent();\n    },\n\n    getValue() {\n      return component_state;\n    },\n  };\n}\n",
+                  "params": {
+                    "allowed_factors": "{{vars.allowed_factors}}",
+                    "enrolled_factors": "{{vars.enrolled_factors}}",
+                    "available_factors": "{{vars.available_factors}}"
+                  },
+                  "schema": {}
+                },
+                "category": "FIELD",
+                "required": true,
+                "transient": false
+              },
+              {
+                "id": "next_button_j0qC",
+                "type": "NEXT_BUTTON",
+                "config": {
+                  "text": "Return to Website"
+                },
+                "category": "BLOCK"
+              }
+            ]
+          },
+          "coordinates": {
+            "x": 494,
+            "y": 25
+          }
+        },
+        {
+          "id": "flow_YQx5",
+          "type": "FLOW",
+          "alias": null,
+          "config": {
+            "flowId": "#FLOW-1#",
+            "nextNode": "step_taB9"
+          },
+          "coordinates": {
+            "x": 154,
+            "y": 99
+          }
+        },
+        {
+          "id": "flow_fgSF",
+          "type": "FLOW",
+          "alias": null,
+          "config": {
+            "flowId": "#FLOW-2#",
+            "nextNode": "step_heTc"
+          },
+          "coordinates": {
+            "x": 1411,
+            "y": -410
+          }
+        },
+        {
+          "id": "flow_h9YK",
+          "type": "FLOW",
+          "alias": null,
+          "config": {
+            "flowId": "#FLOW-3#",
+            "nextNode": "step_6b3E"
+          },
+          "coordinates": {
+            "x": 1465,
+            "y": 30
+          }
+        },
+        {
+          "id": "step_6b3E",
+          "type": "STEP",
+          "alias": "Reload form",
+          "config": {
+            "nextNode": null,
+            "components": [
+              {
+                "id": "html_G4Pd",
+                "type": "HTML",
+                "config": {
+                  "content": "<script>\n  window.location.reload();\n</script>"
+                },
+                "category": "BLOCK"
+              }
+            ]
+          },
+          "coordinates": {
+            "x": 1978,
+            "y": -13
+          }
+        },
+        {
+          "id": "step_heTc",
+          "type": "STEP",
+          "alias": "Wait for enrollment",
+          "config": {
+            "nextNode": null,
+            "components": [
+              {
+                "id": "html_3liE",
+                "type": "HTML",
+                "config": {
+                  "content": "<div class=\"waiting-container\">\n  <div class=\"waiting-icon\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\"\n      stroke-width=\"1\" stroke-line-cap=\"round\" stroke-line-join=\"round\" class=\"animate-spin\">\n      <path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path>\n    </svg>\n  </div>\n  <p class=\"waiting-title\">Waiting for enrollment...</p>\n</div>\n<style>\n  @keyframes spin {\n    to {\n      transform: rotate(1turn)\n    }\n  }\n\n  .animate-spin {\n    animation: spin 1s linear infinite\n  }\n</style>\n<script>\n  function openPopupWindow(popupOptions) {\n    {\n      const dualScreenLeft =\n        window.screenLeft !== undefined ? window.screenLeft : window.screenX;\n      const dualScreenTop =\n        window.screenTop !== undefined ? window.screenTop : window.screenY;\n\n      const width = window.innerWidth\n        ? window.innerWidth\n        : document.documentElement.clientWidth\n          ? document.documentElement.clientWidth\n          : screen.width;\n      const height = window.innerHeight\n        ? window.innerHeight\n        : document.documentElement.clientHeight\n          ? document.documentElement.clientHeight\n          : screen.height;\n\n      const systemZoom = width / window.screen.availWidth;\n      const left = (width - popupOptions.width) / 2 / systemZoom + dualScreenLeft;\n      const top = (height - popupOptions.height) / 2 / systemZoom + dualScreenTop;\n      const newWindow = window.open(\n        popupOptions.url,\n        popupOptions.title,\n        `scrollbars=${popupOptions.scrollbars ? \"yes\" : \"no\"},\n      width=${popupOptions.width / systemZoom},\n      height=${popupOptions.height / systemZoom},\n      top=${top},\n      left=${left}\n      `\n      );\n      \n      window.newWindow = newWindow;\n      newWindow.opener = null;\n      if (popupOptions.focus) {\n        newWindow.focus();\n      }\n      return newWindow;\n    }\n  }\n\n  const enrollmentPopupWindow = openPopupWindow({\n    url: '{{vars.ticket_url}}',\n    title: \"\",\n    width: 450,\n    height: 720,\n    scrollbars: true,\n    focus: true,\n  });\n\n\n  const timer = setInterval(async () => {\n    if (enrollmentPopupWindow && enrollmentPopupWindow.closed) {\n      clearInterval(timer);\n\t\t\twindow.location.reload();\n    }\n  }, 0);\n</script>"
+                },
+                "category": "BLOCK"
+              }
+            ]
+          },
+          "coordinates": {
+            "x": 1770,
+            "y": -453
+          }
+        },
+        {
+          "id": "router_ocYh",
+          "type": "ROUTER",
+          "alias": null,
+          "config": {
+            "rules": [
+              {
+                "id": "id_8218128289615",
+                "alias": "Enroll factor",
+                "nextNode": "flow_fgSF",
+                "condition": {
+                  "operands": [
+                    {
+                      "operands": [
+                        "{{fields.list_factors.action}}",
+                        "enroll_factor"
+                      ],
+                      "operator": "EQ"
+                    }
+                  ],
+                  "operator": "AND"
+                }
+              },
+              {
+                "id": "id_2576722417702",
+                "alias": "Remove factor",
+                "nextNode": "flow_h9YK",
+                "condition": {
+                  "operands": [
+                    {
+                      "operands": [
+                        "{{fields.list_factors.action}}",
+                        "remove_factor"
+                      ],
+                      "operator": "EQ"
+                    }
+                  ],
+                  "operator": "AND"
+                }
+              }
+            ],
+            "fallback": "$ending"
+          },
+          "coordinates": {
+            "x": 1118,
+            "y": 49
+          }
+        }
+      ],
+      "ending": {
+        "content": null,
+        "redirection": null,
+        "callback": null,
+        "afterSubmit": {
+          "email": null,
+          "flowId": null
+        },
+        "coordinates": {
+          "x": 2467,
+          "y": 328
+        },
+        "resumeFlow": true
+      },
+      "social": [],
+      "style": {
+        "css": ".factors-container {\n  display: flex;\n  flex-direction: column;\n}\n\n.factor-container:not(:last-child) {\n  border-bottom: 1px solid var(--input-border-color);\n  padding-bottom: var(--spacing-3);\n  margin-bottom: var(--spacing-3);\n}\n\n.factor-description {\n  font-size: var(--font-size-small);\n  color: var(--font-light-color);\n}\n\n.factor-tag {\n  background: var(--success-color);\n  padding: var(--spacing-0-5) var(--spacing-1);\n  color: white;\n  margin-left: var(--spacing-1);\n  font-size: var(--font-size-small);\n  border-radius: var(--border-radius);\n}\n\n.waiting-icon {\n  display: flex;\n  justify-content: center;\n  margin-bottom: var(--spacing-2);\n}\n\n.waiting-icon svg {\n  height: 48px;\n  width: 48px;\n  stroke: var(--font-light-color);\n}\n\n.waiting-container {\n  text-align: center;\n}\n\n.waiting-title {\n  color: var(--font-light-color);\n}\n\n.factor-action {\n  margin: var(--spacing-1) 0;\n}\n.factor-action button {\n  border-radius: var(--border-radius);\n  padding: var(--spacing-0-5) var(--spacing-3);\n  font-size: var(--font-size-small);\n  border: 1px solid transparent;\n  cursor: pointer;\n}\n\nbutton.factor-enroll {\n  background: rgb(17, 17, 17);\n  color: hsl(210 40% 98%);\n  border-color: rgb(17, 17, 17);\n}\n\nbutton.factor-remove {\n  background: #fff;\n  color: rgb(17, 17, 17);\n  border-color: var(--input-border-color);\n}\n",
+        "theme": "ROUND",
+        "version": "MODERN"
+      },
+      "tags": []
+    },
+    "flows": {
+      "#FLOW-1#": {
+        "name": "Get factors",
+        "description": null,
+        "actions": [
+          {
+            "id": "get_enrolled_factors",
+            "type": "HTTP",
+            "alias": "Get enrolled factors",
+            "notes": null,
+            "action": "SEND_REQUEST",
+            "params": {
+              "url": "https://{{vars.hostname}}/api/v2/users/{{context.user.user_id}}/authentication-methods",
+              "body": null,
+              "type": "JSON",
+              "basic": null,
+              "method": "GET",
+              "params": {},
+              "headers": {
+                "Authorization": "Bearer {{vars.m2m_token}}"
+              },
+              "acceptNOK": false,
+              "connectionId": null
+            },
+            "maskOutput": false,
+            "allowFailure": false
+          },
+          {
+            "id": "get_available_factors",
+            "type": "HTTP",
+            "alias": "Get available factors",
+            "notes": null,
+            "action": "SEND_REQUEST",
+            "params": {
+              "url": "https://{{vars.hostname}}/api/v2/guardian/factors",
+              "body": null,
+              "type": "JSON",
+              "basic": null,
+              "method": "GET",
+              "params": {},
+              "headers": {
+                "Authorization": "Bearer {{vars.m2m_token}}"
+              },
+              "acceptNOK": false,
+              "connectionId": null
+            },
+            "maskOutput": false,
+            "allowFailure": false
+          },
+          {
+            "id": "SetAuthFactors",
+            "type": "FLOW",
+            "alias": null,
+            "notes": null,
+            "action": "STORE_STATE",
+            "params": {
+              "data": {
+                "enrolled_factors": "{{actions.get_enrolled_factors.body}}",
+                "available_factors": "{{actions.get_available_factors.body}}"
+              }
+            },
+            "maskOutput": false,
+            "allowFailure": false
+          }
+        ],
+        "triggers": {
+          "webhook": {
+            "secret": null,
+            "enabled": false
+          }
+        },
+        "synchronous": true,
+        "security": {
+          "rateLimits": []
+        }
+      },
+      "#FLOW-2#": {
+        "name": "Generate MFA ticket",
+        "description": null,
+        "actions": [
+          {
+            "id": "generate_mfa_ticket",
+            "type": "HTTP",
+            "alias": "Generate MFA ticket",
+            "notes": null,
+            "action": "SEND_REQUEST",
+            "params": {
+              "url": "https://{{vars.hostname}}/api/v2/guardian/enrollments/ticket",
+              "body": {
+                "factor": "{{fields.list_factors.selected_factor}}",
+                "user_id": "{{context.user.user_id}}",
+                "send_mail": false,
+                "allow_multiple_enrollments": true
+              },
+              "type": "JSON",
+              "basic": null,
+              "method": "POST",
+              "params": {},
+              "headers": {
+                "Authorization": "Bearer {{vars.m2m_token}}"
+              },
+              "acceptNOK": false,
+              "connectionId": null
+            },
+            "maskOutput": false,
+            "allowFailure": false
+          },
+          {
+            "id": "SetMFATicket",
+            "type": "FLOW",
+            "alias": null,
+            "notes": null,
+            "action": "STORE_STATE",
+            "params": {
+              "data": {
+                "ticket_url": "{{actions.generate_mfa_ticket.body.ticket_url}}"
+              }
+            },
+            "maskOutput": false,
+            "allowFailure": false
+          }
+        ],
+        "triggers": {
+          "webhook": {
+            "secret": null,
+            "enabled": false
+          }
+        },
+        "synchronous": true,
+        "security": {
+          "rateLimits": []
+        }
+      },
+      "#FLOW-3#": {
+        "name": "Remove factor",
+        "description": null,
+        "actions": [
+          {
+            "id": "remove_factor",
+            "type": "HTTP",
+            "alias": "Remove factor",
+            "notes": null,
+            "action": "SEND_REQUEST",
+            "params": {
+              "url": "https://{{vars.hostname}}/api/v2/users/{{context.user.user_id}}/authentication-methods/{{fields.list_factors.enrollment_id}}",
+              "body": null,
+              "type": "JSON",
+              "basic": null,
+              "method": "DELETE",
+              "params": {},
+              "headers": {
+                "Authorization": "Bearer {{vars.m2m_token}}"
+              },
+              "acceptNOK": false,
+              "connectionId": null
+            },
+            "maskOutput": false,
+            "allowFailure": false
+          }
+        ],
+        "triggers": {
+          "webhook": {
+            "secret": null,
+            "enabled": false
+          }
+        },
+        "synchronous": true,
+        "security": {
+          "rateLimits": []
+        }
+      }
+    },
+    "connections": {}
+  }

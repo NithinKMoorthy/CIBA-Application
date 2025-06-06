@@ -4,7 +4,7 @@ import axios from 'axios';
 export async function POST(req) {
   try {
     const {  m2mToken } = await req.json(); // Extract userId and M2M token
-    console.log("USERID: ", userId, " + M2MToken: ", m2mToken);
+    console.log("M2MToken: ", m2mToken);
     
     const domain = 'dev-ow0gmshf.us.auth0.com';
 

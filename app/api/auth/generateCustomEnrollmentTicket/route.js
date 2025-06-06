@@ -2,12 +2,15 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 
 export async function POST(req) {
+  console.log("Generate Custom Enrollment Endpoint Hit");
   try {
-    const { userId, m2mToken } = await req.json(); // Extract userId and M2M token
-    console.log("USERID: ", userId, " + M2MToken: ", m2mToken);
+    let { userId, m2mToken, type } = await req.json(); // Extract userId and M2M token
+    console.log("USERID: ", userId, " + M2MToken: ", m2mToken, " type: ", type);
     
     const domain = 'dev-ow0gmshf.us.auth0.com';
-
+    if(type == 'sms'){
+      type = 'phone'
+    }
     // Create an MFA Enrollment Ticket (without phone_number in the payload)
     const enrollmentTicketResponse = await axios.post(
       `https://${domain}/api/v2/guardian/enrollments/ticket`,
@@ -15,7 +18,7 @@ export async function POST(req) {
         user_id: userId,  // Auth0 user ID
         send_mail: false, // Optionally send an email with enrollment instructions
         allow_multiple_enrollments: true, 
-        factor: 'phone'
+        factor: type
       },
       {
         headers: {
