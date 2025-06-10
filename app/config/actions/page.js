@@ -6,6 +6,30 @@ import { usePathname } from "next/navigation";
 import axios from "axios";
 import { FaBolt } from "react-icons/fa";
 
+const ActionCard = ({ action, isActive, onToggle, showTrigger }) => (
+  <div className="border rounded-xl p-4 shadow bg-white space-y-2">
+    <div className="text-lg font-medium text-gray-800 flex items-center justify-between">
+      <div className="flex items-center">
+        <FaBolt className={isActive ? "text-yellow-500 mr-2" : "text-gray-400 mr-2"} />
+        {action.name}
+      </div>
+      {onToggle && (
+        <button
+          onClick={onToggle}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          {isActive ? "Deactivate" : "Activate"}
+        </button>
+      )}
+    </div>
+    {showTrigger && (
+      <div className="text-sm text-gray-600">
+        Trigger: {action.supported_triggers?.[0]?.id ?? "unknown"}
+      </div>
+    )}
+  </div>
+);
+
 export default function ActionsPage() {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
@@ -74,7 +98,8 @@ export default function ActionsPage() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 p-6">
-      <h1 className="text-2xl font-semibold mb-6">Actions Dashboard</h1>
+      <h1 className="text-2xl font-semibold mb-2">Actions Dashboard</h1>
+      <p className="mb-6 text-gray-600">Manage action deployments and quickly bind actions to triggers.</p>
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -94,18 +119,13 @@ export default function ActionsPage() {
             <h2 className="text-xl font-medium mb-4">Active Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {activeActions.map((action) => (
-                <div
+                <ActionCard
                   key={action.id}
-                  className="border rounded-xl p-4 shadow-sm bg-white space-y-2"
-                >
-                  <div className="text-lg font-medium text-gray-800 flex items-center">
-                    <FaBolt className="text-yellow-500 mr-2" />
-                    {action.name}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Trigger: {action.supported_triggers?.[0]?.id ?? "unknown"}
-                  </div>
-                </div>
+                  action={action}
+                  isActive={true}
+                  onToggle={() => console.log('deactivate', action.id)}
+                  showTrigger
+                />
               ))}
               {activeActions.length === 0 && (
                 <p className="text-gray-600 col-span-full">No active actions</p>
@@ -117,18 +137,13 @@ export default function ActionsPage() {
             <h2 className="text-xl font-medium mb-4">Inactive Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {inactiveActions.map((action) => (
-                <div
+                <ActionCard
                   key={action.id}
-                  className="border rounded-xl p-4 shadow-sm bg-white space-y-2"
-                >
-                  <div className="text-lg font-medium text-gray-800 flex items-center">
-                    <FaBolt className="text-gray-400 mr-2" />
-                    {action.name}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Trigger: {action.supported_triggers?.[0]?.id ?? "unknown"}
-                  </div>
-                </div>
+                  action={action}
+                  isActive={false}
+                  onToggle={() => console.log('activate', action.id)}
+                  showTrigger
+                />
               ))}
               {inactiveActions.length === 0 && (
                 <p className="text-gray-600 col-span-full">No inactive actions</p>
@@ -137,18 +152,23 @@ export default function ActionsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-medium mb-4">Actions by Trigger</h2>
+            <h2 className="text-xl font-medium mb-4">Active Actions by Trigger</h2>
             {triggers.map((trigger) => (
               <div key={trigger.id} className="mb-6">
                 <h3 className="font-semibold mb-2">{trigger.id}</h3>
-                <ul className="ml-4 list-disc">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {(bindings[trigger.id] || []).map((b) => (
-                    <li key={b.id || b.action_id}>{b.display_name || b.action_name || b.name}</li>
+                    <ActionCard
+                      key={b.id || b.action_id}
+                      action={{ name: b.display_name || b.action_name || b.name, supported_triggers: [{ id: trigger.id }] }}
+                      isActive={true}
+                      onToggle={() => console.log('remove', b.id || b.action_id)}
+                    />
                   ))}
                   {(bindings[trigger.id] || []).length === 0 && (
-                    <li className="text-gray-500">No actions bound</li>
+                    <p className="text-gray-500 col-span-full">No actions bound</p>
                   )}
-                </ul>
+                </div>
               </div>
             ))}
           </section>
