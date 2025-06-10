@@ -10,6 +10,10 @@ export default function ActionsPage() {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
   const [actions, setActions] = useState([]);
+  const [activeActions, setActiveActions] = useState([]);
+  const [inactiveActions, setInactiveActions] = useState([]);
+  const [triggers, setTriggers] = useState([]);
+  const [bindings, setBindings] = useState({});
   const [loading, setLoading] = useState(true);
 
   const getM2MToken = async () => {
@@ -25,7 +29,10 @@ export default function ActionsPage() {
         m2mToken
       });
       console.log("Response.data:" , response.data);
-      setActions(response.data.actions || []);
+      const allActions = response.data.actions || [];
+      setActions(allActions);
+      setActiveActions(allActions.filter(a => a.deployed));
+      setInactiveActions(allActions.filter(a => !a.deployed));
     } catch (error) {
       console.error("Error fetching actions:", error);
     } finally {
@@ -40,19 +47,24 @@ export default function ActionsPage() {
         m2mToken
       });
       console.log("Response.data for Triggers:" , response.data);
-      sortTriggers(response.data.triggers);
+      const triggers = response.data.triggers || [];
+      setTriggers(triggers);
+      triggers.forEach(async(trigger) => {
+        try {
+          const res = await axios.post("/api/auth/getTriggerBindings", {
+            m2mToken,
+            triggerId: trigger.id
+          });
+          setBindings(prev => ({ ...prev, [trigger.id]: res.data.bindings || [] }));
+        } catch (err) {
+          console.error('Error fetching trigger bindings:', err);
+        }
+      });
     } catch (error) {
       console.error("Error fetching actions:", error);
     } finally {
       setLoading(false);
     }
-  }
-  
-  const sortTriggers = async(triggers) => {
-      let triggerIdArray = triggers.map(trigger => trigger.id);
-      console.log("TriggerIdArray", triggerIdArray);
-      const triggerSet = new Set(triggerIdArray);
-      console.log("Trigger Set: ", triggerSet);
   }
 
   useEffect(() => {
@@ -62,7 +74,7 @@ export default function ActionsPage() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 p-6">
-      <h1 className="text-2xl font-semibold mb-6">Post-Login Actions</h1>
+      <h1 className="text-2xl font-semibold mb-6">Actions Dashboard</h1>
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -77,31 +89,70 @@ export default function ActionsPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {actions.map((action) => (
-            <div
-              key={action.id}
-              className="border rounded-xl p-4 shadow-sm bg-white space-y-2"
-            >
-              <div className="text-lg font-medium text-gray-800 flex items-center">
-                <FaBolt className="text-yellow-500 mr-2" />
-                {action.name}
-              </div>
-              <div className="text-sm text-gray-600">
-                Trigger: {action.supported_triggers?.[0]?.id ?? "unknown"}
-              </div>
-              <div className="text-xs text-gray-400">
-                Created: {new Date(action.created_at).toLocaleString()}
-              </div>
-              <div className="text-xs text-gray-400">
-                Updated: {new Date(action.updated_at).toLocaleString()}
-              </div>
-              <div className="text-xs font-mono bg-gray-100 p-2 rounded overflow-x-auto">
-                {action.code?.slice(0, 100)}...
-              </div>
+        <>
+          <section className="mb-8">
+            <h2 className="text-xl font-medium mb-4">Active Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeActions.map((action) => (
+                <div
+                  key={action.id}
+                  className="border rounded-xl p-4 shadow-sm bg-white space-y-2"
+                >
+                  <div className="text-lg font-medium text-gray-800 flex items-center">
+                    <FaBolt className="text-yellow-500 mr-2" />
+                    {action.name}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Trigger: {action.supported_triggers?.[0]?.id ?? "unknown"}
+                  </div>
+                </div>
+              ))}
+              {activeActions.length === 0 && (
+                <p className="text-gray-600 col-span-full">No active actions</p>
+              )}
             </div>
-          ))}
-        </div>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-xl font-medium mb-4">Inactive Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {inactiveActions.map((action) => (
+                <div
+                  key={action.id}
+                  className="border rounded-xl p-4 shadow-sm bg-white space-y-2"
+                >
+                  <div className="text-lg font-medium text-gray-800 flex items-center">
+                    <FaBolt className="text-gray-400 mr-2" />
+                    {action.name}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Trigger: {action.supported_triggers?.[0]?.id ?? "unknown"}
+                  </div>
+                </div>
+              ))}
+              {inactiveActions.length === 0 && (
+                <p className="text-gray-600 col-span-full">No inactive actions</p>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-medium mb-4">Actions by Trigger</h2>
+            {triggers.map((trigger) => (
+              <div key={trigger.id} className="mb-6">
+                <h3 className="font-semibold mb-2">{trigger.id}</h3>
+                <ul className="ml-4 list-disc">
+                  {(bindings[trigger.id] || []).map((b) => (
+                    <li key={b.id || b.action_id}>{b.display_name || b.action_name || b.name}</li>
+                  ))}
+                  {(bindings[trigger.id] || []).length === 0 && (
+                    <li className="text-gray-500">No actions bound</li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </section>
+        </>
       )}
     </div>
   );
