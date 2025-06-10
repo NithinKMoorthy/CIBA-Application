@@ -10,7 +10,7 @@ export async function POST(req) {
     const domain = 'dev-ow0gmshf.us.auth0.com';
 
     const actionsResponse = await axios.get(
-      `https://${domain}/api/v2/actions/actions?deployed=true`,
+      `https://${domain}/api/v2/actions/actions`,
       {
         headers: {
           Authorization: `Bearer ${m2mToken}`,
