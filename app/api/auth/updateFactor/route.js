@@ -5,7 +5,7 @@ export async function PUT(req) {
   try {
     const { m2mToken, name, enabled } = await req.json();
 
-    const domain = 'dev-ow0gmshf.us.auth0.com';
+    const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
 
     const updateResponse = await axios.put(
       `https://${domain}/api/v2/guardian/factors/${name}`,

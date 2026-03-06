@@ -25,6 +25,8 @@ const Home = () => {
       const res = await axios.post('/api/auth/ROPG', { username, password });
       if (res.data.access_token) {
         console.log("Access Token: ", res.data.access_token);
+        // Login successful without MFA - store tokens and redirect
+        storeTokensAndRedirect(res.data);
       }
     } catch (err) {
       const error = err.response?.data;
@@ -47,7 +49,8 @@ const Home = () => {
 
   const getAuthenticators = async (token) => {
     try {
-      const response = await axios.get('https://dev-ow0gmshf.us.auth0.com/mfa/authenticators', {
+      const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN || process.env.NEXT_PUBLIC_AUTH0_ISSUER_BASE_URL?.replace('https://', '');
+      const response = await axios.get(`https://${domain}/mfa/authenticators`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -76,27 +79,48 @@ const Home = () => {
   };
 
   const handleOtpSubmit = async () => {
-    // alert(`Submitted ${otp}`);
-    console.log("MFA_TOKEN: ", mfaToken);
-    const response = await axios.post('/api/auth/verify-otp', {
-      mfaToken,
-      otp,
-      oobCode
-    }).then(res => {
-      console.log("Res.data: ", res.data);
-      createSession(res.data);
-    })
-    .catch(err => console.log('Error: ', error)); 
+    setIsLoading(true);
+    try {
+      console.log("MFA_TOKEN: ", mfaToken);
+      const response = await axios.post('/api/auth/verify-otp', {
+        mfaToken,
+        otp,
+        oobCode
+      });
+      console.log("Res.data: ", response.data);
+      storeTokensAndRedirect(response.data);
+    } catch (err) {
+      console.log('Error: ', err);
+      setError('Failed to verify OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  const createSession = async (session) => {
-    console.log("Creating Session");
-    const decodedUser = jwtDecode(session.id_token); // Decode user info
-    await axios.post('/api/auth/createSession', {
-      accessToken: session.access_token,
-      idToken: session.id_token,
-      user: decodedUser, // You'll need to decode the ID token or fetch user info manually
-    });
+  const storeTokensAndRedirect = (tokens) => {
+    console.log("Storing tokens locally");
+
+    // Store tokens in localStorage
+    if (tokens.access_token) {
+      localStorage.setItem('ropg_access_token', tokens.access_token);
+    }
+    if (tokens.id_token) {
+      localStorage.setItem('ropg_id_token', tokens.id_token);
+    }
+    if (tokens.refresh_token) {
+      localStorage.setItem('ropg_refresh_token', tokens.refresh_token);
+    }
+
+    // Store timestamp for token management
+    localStorage.setItem('ropg_token_timestamp', new Date().toISOString());
+
+    // Set authentication cookie for middleware
+    // Cookie expires in 24 hours
+    const expiryDate = new Date();
+    expiryDate.setHours(expiryDate.getHours() + 24);
+    document.cookie = `ropg_authenticated=true; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+
+    // Redirect to dashboard
     window.location.href = '/dashboard';
   }
 

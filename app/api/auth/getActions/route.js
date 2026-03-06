@@ -6,8 +6,8 @@ export async function POST(req) {
   try {
     const { m2mToken } = await req.json(); // Extract M2M token
     console.log("M2MToken: ", m2mToken);
-    
-    const domain = 'dev-ow0gmshf.us.auth0.com';
+
+    const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
 
     const actionsResponse = await axios.get(
       `https://${domain}/api/v2/actions/actions?deployed=true`,

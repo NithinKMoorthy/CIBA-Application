@@ -4,21 +4,25 @@ import axios from 'axios';
 export async function POST(req) {
   const { username, password } = await req.json();
 
-  const clientId = 'yrWxK1NYTvtsSA20UswtvqVUojjBwEMX';
-  const clientSecret = '-en0wiP4J6Ir_NsfcuZ6JDxUrxNQTvQ6q-aUuRUt2MpBIzywauU12L0E6qXy6haT';
+  const clientId = process.env.AUTH0_CLIENT_ID;
+  const clientSecret = process.env.AUTH0_CLIENT_SECRET;
+  const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
+  const issuerBaseUrl = process.env.AUTH0_ISSUER_BASE_URL || `https://${domain}`;
 
   const options = {
     method: 'POST',
-    url: 'https://dev-ow0gmshf.us.auth0.com/oauth/token',
+    url: `https://${domain}/oauth/token`,
     headers: { 'Content-Type': 'application/json' },
     data: {
       client_id: clientId,
       client_secret: clientSecret,
-      audience: 'https://ropg-api', 
+      audience: `${issuerBaseUrl}/me/`,
+      // audience: 'https://ropg-api',
       grant_type: 'password',
       username,
       password,
-      scope: 'openid profile email read:authenticators',
+      scope: 'openid profile email offline_access'
+      // scope: 'openid profile email offline_access read:me:factors read:me:authentication_methods create:me:authentication_methods',
     },
   };
 

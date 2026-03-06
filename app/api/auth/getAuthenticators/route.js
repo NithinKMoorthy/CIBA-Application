@@ -5,7 +5,7 @@ import { access } from 'fs';
 
 export async function POST(req) {
   const { userId } = await req.json(); // Expecting userId in request body
-  const domain = 'dev-ow0gmshf.us.auth0.com';
+  const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
   const clientId = process.env.AUTH0_CLIENT_ID;
   const clientSecret = process.env.AUTH0_CLIENT_SECRET;
   console.log("USER ID :", userId);
@@ -14,7 +14,7 @@ export async function POST(req) {
     const tokenResponse = await axios.post(`https://${domain}/oauth/token`, {
       client_id: clientId,
       client_secret: clientSecret,
-      audience: `https://dev-ow0gmshf.us.auth0.com/api/v2/`,
+      audience: `https://${domain}/api/v2/`,
       grant_type: 'client_credentials',
       scope: 'read:authentication_methods update:users'
     });

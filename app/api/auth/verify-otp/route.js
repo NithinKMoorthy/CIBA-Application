@@ -10,12 +10,13 @@ export async function POST(req) {
     console.log("OOB CODE: ", oobCode);
 
     // Client details
-    const client_id = 'yrWxK1NYTvtsSA20UswtvqVUojjBwEMX';
-    const client_secret = '-en0wiP4J6Ir_NsfcuZ6JDxUrxNQTvQ6q-aUuRUt2MpBIzywauU12L0E6qXy6haT';
+    const client_id = process.env.AUTH0_CLIENT_ID;
+    const client_secret = process.env.AUTH0_CLIENT_SECRET;
+    const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
 
     // Prepare the request body
     const response = await axios.post(
-      'https://dev-ow0gmshf.us.auth0.com/oauth/token',
+      `https://${domain}/oauth/token`,
       new URLSearchParams({
         grant_type: 'http://auth0.com/oauth/grant-type/mfa-oob',
         client_id,

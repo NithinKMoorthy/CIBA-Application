@@ -5,9 +5,11 @@ import jwksClient from 'jwks-rsa';
 
 export const dynamic = 'force-dynamic'; // Ensure this route is dynamic
 
+const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
+
 // Correct JWKS URI with full Auth0 domain
 const client = jwksClient({
-  jwksUri: `https://dev-ow0gmshf.us.auth0.com/.well-known/jwks.json`,
+  jwksUri: `https://${domain}/.well-known/jwks.json`,
 });
 
 // Function to retrieve the public key

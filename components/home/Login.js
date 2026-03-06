@@ -16,13 +16,15 @@ export default function Login() {
 
   const handleLogin = async () => {
     setIsLoading(true);
+    setError('');
     try {
       const response = await axios.post('/api/auth/ROPG', { username, password });
       const data = response.data;
 
       if (data.access_token) {
-        setAccessToken(data.access_token);
-        setError('');
+        console.log("Login successful, access token received");
+        // Login successful without MFA - store tokens and redirect
+        storeTokensAndRedirect(data);
       } else {
         setError(data.error || 'Login failed');
       }
@@ -32,6 +34,7 @@ export default function Login() {
         setMfaToken(error.mfa_token);
         promptMFA(error.mfa_token);
       } else {
+        setError('Login failed. Please check your credentials.');
         console.error("Unexpected error structure:", err);
       }
     }
@@ -48,7 +51,8 @@ export default function Login() {
   };
 
   const promptMFA = async (accessToken) => {
-    const authenticatorsResponse = await axios.get('https://dev-ow0gmshf.us.auth0.com/mfa/authenticators', {
+    const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN || process.env.NEXT_PUBLIC_AUTH0_ISSUER_BASE_URL?.replace('https://', '');
+    const authenticatorsResponse = await axios.get(`https://${domain}/mfa/authenticators`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -64,12 +68,48 @@ export default function Login() {
   };
 
   const handleOtpSubmit = async () => {
-    const response = await axios.post('/api/auth/verify-otp', {
-      mfa_token: mfaToken,
-      otp,
-      oobCode,
-    });
-    alert(response.data);
+    setIsLoading(true);
+    try {
+      const response = await axios.post('/api/auth/verify-otp', {
+        mfa_token: mfaToken,
+        otp,
+        oobCode,
+      });
+      console.log("OTP verification successful:", response.data);
+      storeTokensAndRedirect(response.data);
+    } catch (err) {
+      console.error("OTP verification failed:", err);
+      setError('Failed to verify OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const storeTokensAndRedirect = (tokens) => {
+    console.log("Storing tokens locally");
+
+    // Store tokens in localStorage
+    if (tokens.access_token) {
+      localStorage.setItem('ropg_access_token', tokens.access_token);
+    }
+    if (tokens.id_token) {
+      localStorage.setItem('ropg_id_token', tokens.id_token);
+    }
+    if (tokens.refresh_token) {
+      localStorage.setItem('ropg_refresh_token', tokens.refresh_token);
+    }
+
+    // Store timestamp for token management
+    localStorage.setItem('ropg_token_timestamp', new Date().toISOString());
+
+    // Set authentication cookie for middleware
+    // Cookie expires in 24 hours
+    const expiryDate = new Date();
+    expiryDate.setHours(expiryDate.getHours() + 24);
+    document.cookie = `ropg_authenticated=true; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+
+    // Redirect to dashboard
+    window.location.href = '/dashboard';
   };
 
   return (

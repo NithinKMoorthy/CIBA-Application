@@ -8,8 +8,9 @@ export async function POST(req) {
     console.log("MFA Token", mfa_token);
     console.log("Authenticators: ", authenticators);
 
-    const clientId = 'yrWxK1NYTvtsSA20UswtvqVUojjBwEMX';
-    const clientSecret = '-en0wiP4J6Ir_NsfcuZ6JDxUrxNQTvQ6q-aUuRUt2MpBIzywauU12L0E6qXy6haT';
+    const clientId = process.env.AUTH0_CLIENT_ID;
+    const clientSecret = process.env.AUTH0_CLIENT_SECRET;
+    const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
     const body =  {
       client_id: clientId,
       client_secret: clientSecret,
@@ -17,7 +18,7 @@ export async function POST(req) {
       challenge_type: 'oob',
       authenticator_id: authenticators[0].id
     };
-    const url = 'https://dev-ow0gmshf.us.auth0.com/mfa/challenge';
+    const url = `https://${domain}/mfa/challenge`;
     // Make a request to Auth0 to verify the OTP
     const response = await axios.post(
       url, 

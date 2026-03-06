@@ -5,12 +5,13 @@ export async function POST(req) {
   try {
     const { mfa_token, otp } = await req.json();
     console.log("HELLO");
-    const clientId = 'yrWxK1NYTvtsSA20UswtvqVUojjBwEMX';
-    const clientSecret = '-en0wiP4J6Ir_NsfcuZ6JDxUrxNQTvQ6q-aUuRUt2MpBIzywauU12L0E6qXy6haT';
+    const clientId = process.env.AUTH0_CLIENT_ID;
+    const clientSecret = process.env.AUTH0_CLIENT_SECRET;
+    const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
 
     // Make a request to Auth0 to verify the OTP
     const response = await axios.post(
-      'https://dev-ow0gmshf.us.auth0.com/oauth/token',
+      `https://${domain}/oauth/token`,
       {
         grant_type: 'http://auth0.com/oauth/grant-type/mfa-otp',
         client_id: clientId,

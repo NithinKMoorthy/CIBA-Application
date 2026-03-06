@@ -8,8 +8,8 @@ export async function PUT(req) {
     // console.log("m2Mtoken: ", m2mToken);
     console.log("policy: ", policy);
     console.log("enabled: ", enabled);
-   
-    const domain = 'dev-ow0gmshf.us.auth0.com';
+
+    const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
     let policies = [];
     if(policy == 'all-applications') {
       policies.push('all-applications'); 

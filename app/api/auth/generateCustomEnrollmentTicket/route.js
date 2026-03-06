@@ -6,8 +6,8 @@ export async function POST(req) {
   try {
     let { userId, m2mToken, type } = await req.json(); // Extract userId and M2M token
     console.log("USERID: ", userId, " + M2MToken: ", m2mToken, " type: ", type);
-    
-    const domain = 'dev-ow0gmshf.us.auth0.com';
+
+    const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
     if(type == 'sms'){
       type = 'phone'
     }
@@ -18,7 +18,7 @@ export async function POST(req) {
         user_id: userId,  // Auth0 user ID
         send_mail: false, // Optionally send an email with enrollment instructions
         allow_multiple_enrollments: true, 
-        // factor: type
+        factor: type
       },
       {
         headers: {

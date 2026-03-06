@@ -5,8 +5,10 @@ import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic'; // Ensure dynamic route
 
+const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
+
 const client = jwksClient({
-  jwksUri: `https://dev-ow0gmshf.us.auth0.com/.well-known/jwks.json`,
+  jwksUri: `https://${domain}/.well-known/jwks.json`,
 });
 
 // Function to retrieve the public key
@@ -46,15 +48,21 @@ const handleTokenVerification = (idToken) => {
 export async function GET(request) {
   try {
     // Retrieve access token from session
-    const { accessToken } = await getAccessToken(); // Destructure accessToken
+    const { accessToken } = await getAccessToken(request); // Pass request to getAccessToken
     const session = await getSession(request); // Pass request object if necessary
+
+    console.log('Full session object:', JSON.stringify(session, null, 2));
+
     const idToken = session?.idToken;
+    const refreshToken = session?.refreshToken; // Get refresh token from session
 
     // Perform token verification if needed
     const isMfaVerified = await handleTokenVerification(idToken);
 
-    // Respond with the access token and verification status
-    return NextResponse.json({ accessToken, idToken, isMfaVerified });
+    console.log('Refresh token found:', refreshToken ? 'Yes' : 'No');
+
+    // Respond with the access token, refresh token, and verification status
+    return NextResponse.json({ accessToken, refreshToken, idToken, isMfaVerified });
   } catch (error) {
     console.error('Error retrieving access token:', error);
     return NextResponse.json({ error: error.message }, { status: error.status || 500 });

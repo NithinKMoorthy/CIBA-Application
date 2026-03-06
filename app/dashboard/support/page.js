@@ -82,13 +82,21 @@ const AuthenticatorDashboard = () => {
         }).then(res => res.json())
       ]);
 
+      // Check for API errors
+      if (tenantRes.error) {
+        throw new Error(tenantRes.error);
+      }
+      if (userRes.error) {
+        throw new Error(userRes.error);
+      }
+
       const tenantFactors = tenantRes.ticket_url || tenantRes;
-      const enabledFactors = tenantFactors.filter(f => f.enabled);
+      const enabledFactors = Array.isArray(tenantFactors) ? tenantFactors.filter(f => f.enabled) : [];
 
       const mapped = enabledFactors.map(factor => {
-        const userFactors = userRes.filter(
+        const userFactors = Array.isArray(userRes) ? userRes.filter(
           a => a.preferred_authentication_method === factor.name || a.type === factor.name
-        );
+        ) : [];
         const meta = factorDescriptions[factor.name] || {
           name: factor.name,
           type: "Unknown",
@@ -169,7 +177,7 @@ const AuthenticatorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto ">
         <DashboardHeader
           getRealAuthenticators={getRealAuthenticators}
           isRefreshing={isRefreshing}

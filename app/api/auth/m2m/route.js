@@ -2,18 +2,18 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 
 export async function GET() {
-  const clientId = 'yrWxK1NYTvtsSA20UswtvqVUojjBwEMX';
-  const clientSecret = '-en0wiP4J6Ir_NsfcuZ6JDxUrxNQTvQ6q-aUuRUt2MpBIzywauU12L0E6qXy6haT';
-  const domain = 'https://dev-ow0gmshf.us.auth0.com/api/v2/';
+  const clientId = process.env.AUTH0_CLIENT_ID;
+  const clientSecret = process.env.AUTH0_CLIENT_SECRET;
+  const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
 
   const options = {
     method: 'POST',
-    url: `https://dev-ow0gmshf.us.auth0.com/oauth/token`,
+    url: `https://${domain}/oauth/token`,
     headers: { 'content-type': 'application/json' },
     data: {
       client_id: clientId,
       client_secret: clientSecret,
-      audience: 'https://dev-ow0gmshf.us.auth0.com/api/v2/',
+      audience: `https://${domain}/api/v2/`,
       grant_type: 'client_credentials',
     },
   };

@@ -18,8 +18,21 @@ import Image from 'next/image';
 // });
 
 const ProfileNav = () => {
-  const pathname = usePathname(); 
-  const isActive = (path) => pathname === path; 
+  const pathname = usePathname();
+  const isActive = (path) => pathname === path;
+
+  const handleLogout = () => {
+    // Clear ROPG tokens and cookie before logging out
+    localStorage.removeItem('ropg_access_token');
+    localStorage.removeItem('ropg_id_token');
+    localStorage.removeItem('ropg_refresh_token');
+    localStorage.removeItem('ropg_token_timestamp');
+    document.cookie = 'ropg_authenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+    // Redirect to Auth0 logout
+    window.location.href = '/api/auth/logout';
+  };
+
   return (
     <div className="flex flex-col flex-grow h-full w-full ">
       {/* Logo Section */}
@@ -35,7 +48,7 @@ const ProfileNav = () => {
         </div>
         <div className={`${isActive('/dashboard/card') ? 'bg-blue-500 text-white font-bold hover:none' : 'text-black hover:bg-blue-200 hover:text-white'}  rounded flex  w-full p-2 items-center justify-start p-2`}> <FontAwesomeIcon icon={faCreditCard} /> <div className="ml-2">Card</div> </div>
         <div className={`${isActive('/dashboard/transactions') ? 'bg-blue-500 text-white font-bold hover:none' : 'text-black hover:bg-blue-200 hover:text-white'}  rounded flex  w-full p-2 items-center justify-start p-2`}> <FontAwesomeIcon icon={faFileInvoice} /><div className="ml-2"> <Link href='/dashboard/transactions'> Transaction </Link></div>  </div>
-        <div className={`${isActive('/dashboard/reporting') ? 'bg-blue-500 text-white font-bold hover:none' : 'text-black hover:bg-blue-200 hover:text-white'}  rounded flex  w-full p-2 items-center justify-start p-2`}><FontAwesomeIcon icon={faChartLine} /><div className="ml-2">  Reporting </div>  </div>
+        <div className={`${isActive('/dashboard/reporting') ? 'bg-blue-500 text-white font-bold hover:none' : 'text-black hover:bg-blue-200 hover:text-white'}  rounded flex  w-full p-2 items-center justify-start p-2`}><FontAwesomeIcon icon={faChartLine} /><div className="ml-2">  <Link href="/dashboard/reporting">Account Management</Link> </div>  </div>
         <div className={`${isActive('/dashboard/accounts') ? 'bg-blue-500 text-white font-bold hover:none' : 'text-black hover:bg-blue-200 hover:text-white'}  rounded flex  w-full p-2 items-center justify-start p-2`}><FontAwesomeIcon icon={faUser} /><div className="ml-2">  <Link href="/dashboard/accounts">Account </Link></div></div>
       </div>
 
@@ -47,8 +60,9 @@ const ProfileNav = () => {
 
         
         <div className="p-4 border-t border-black">
-          <div className='hover:bg-gray-500 hover:text-white rounded flex  w-full p-2 items-center justify-start p-2'><FontAwesomeIcon icon={faRightFromBracket} />
-            <div className="ml-2">  <a href="/api/auth/logout">Logout  </a></div>
+          <div className='hover:bg-gray-500 hover:text-white rounded flex  w-full p-2 items-center justify-start p-2 cursor-pointer' onClick={handleLogout}>
+            <FontAwesomeIcon icon={faRightFromBracket} />
+            <div className="ml-2">Logout</div>
           </div>
         </div>
         </div>

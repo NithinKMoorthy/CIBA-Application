@@ -6,8 +6,8 @@ export async function POST(req) {
   console.log("IN EMAIL ADD: ");
   try {
     const { m2mToken } = await req.json(); // Extract userId and M2M token
-    
-    const domain = 'dev-ow0gmshf.us.auth0.com';
+
+    const domain = process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL?.replace('https://', '');
 
     // Create an MFA Enrollment Ticket (without phone_number in the payload)
     const emailAddedResponse = await axios.put(

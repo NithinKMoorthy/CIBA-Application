@@ -29,14 +29,15 @@ const Header = () => {
   };
 
   const redirectToAuth0= () => {
-      const clientId = 'yrWxK1NYTvtsSA20UswtvqVUojjBwEMX';
-      const domain = 'dev-ow0gmshf.us.auth0.com';
-      const redirectUri = 'http://localhost:3000/api/auth/callback';
+      const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID;
+      const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN || process.env.NEXT_PUBLIC_AUTH0_ISSUER_BASE_URL?.replace('https://', '');
+      const baseUrl = process.env.NEXT_PUBLIC_AUTH0_BASE_URL || 'http://localhost:3000';
+      const redirectUri = `${baseUrl}/api/auth/callback`;
       const state = 'yourOpaqueValue'; // Should be dynamically generated in a real scenario
       // const acrValues = 'http://schemas.openid.net/pape/policies/2007/06/multi-factor';
-  
+
       // const authUrl = `https://${domain}/authorize?audience=https://${domain}/userinfo&scope=openid&response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&acr_values=${acrValues}`;
-      const authUrl = `https://${domain}/authorize?scope=openid&response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state} `
+      const authUrl = `https://${domain}/authorize?scope=openid&response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&customParam=${'hello'}`
       window.location.href = authUrl; // Redirect the user to the Auth0 authorization URL
   }
   // Handle send money logic
